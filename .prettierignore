@@ -1,0 +1,16 @@
+# Ignorer tous les fichiers à la racine du projet
+/*.*
+/*.json
+/*.md
+/*.js
+
+# Exclure tous les fichiers de test TypeScript
+*.spec.ts
+
+# Exclure les tests e2e
+cypress/**
+coverage/**
+
+# Ignorer les dossiers spécifiques
+/dist
+/node_modules
