@@ -1,7 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nabla&display=swap');
+
 :root {
-    --primary-color: #000000;
-    --primary-color-text: #ffffff;
-    --surface-ground: #1e293b; /* slate-800 */
-    --surface-card: #334155; /* slate-700 */
-    --text-color: #e2e8f0; /* slate-200 */
+  --primary-color: #000000;
+  --primary-color-text: #ffffff;
+  --background-color: #1e293b;
+  --surface-card: #485362;
+  --secondary-color: #fda931;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.caveat-font {
+  font-size: 1.5rem;
+  font-family: 'Caveat', cursive;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.nabla-font {
+  font-family: 'Nabla', system-ui;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    'EDPT' 100,
+    'EHLT' 12;
+}
+
+.page {
+  background-color: var(--background-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
 }

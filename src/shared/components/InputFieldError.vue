@@ -5,10 +5,10 @@
 </template>
 
 <script setup lang="ts">
-import {defineProps} from 'vue';
+import { defineProps } from 'vue';
 import Message from 'primevue/message';
 
 defineProps({
-  error: {type: Object, required: true}
+  error: { type: Object, required: true },
 });
 </script>

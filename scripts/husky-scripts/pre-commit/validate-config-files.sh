@@ -7,8 +7,6 @@ fi
 
 PROTECTED_FILES=(
     ".prettierrc.json"
-    "eslint.config.js"
-    ".husky/pre-commit"
 )
 
 PROTECTED_DIR="husky-scripts"
