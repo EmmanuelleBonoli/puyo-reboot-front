@@ -1,4 +1,5 @@
 import { useAuthStore } from '../../Authentication/store/auth.store';
+import { baseApiUrl } from '../models/sharedVariables.ts';
 
 type RequestOptions = RequestInit & {
   auth?: boolean; // besoin d’Authorization: Bearer token ?
@@ -6,8 +7,6 @@ type RequestOptions = RequestInit & {
 
 export async function http<T>(url: string, options: RequestOptions = {}): Promise<T> {
   const store = useAuthStore();
-
-  const baseApiUrl = import.meta.env.VITE_API_URL;
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',

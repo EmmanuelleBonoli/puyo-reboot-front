@@ -1,5 +1,5 @@
 <template>
-  <Form :initialValues="initialValues" :resolver="resolver" @submit="onFormSubmit" class="grid lg:grid-cols-2 gap-4 w-full">
+  <Form :initialValues="initialValues" :resolver="resolverLogin" @submit="onFormSubmit" class="grid lg:grid-cols-2 gap-4 w-full">
     <div class="flex flex-col justify-center items-center gap-4">
       <InputField v-for="field in fields" :key="field.name" v-bind="field" />
 
@@ -15,9 +15,12 @@ import type { FormResolverOptions, FormSubmitEvent } from '@primevue/forms';
 import { Form } from '@primevue/forms';
 import InputField from '../../shared/components/InputField.vue';
 import { Button } from 'primevue';
-import type { LoginFormValues, ResolverResult } from '../models/user';
+import type { LoginFormValues } from '../models/user';
+import type { ResolverResult } from '../../shared/models/form';
 import { AuthFacadeService } from '../services/auth-facade.service.ts';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const toast = useToast();
 const authFacade = new AuthFacadeService();
 
@@ -44,7 +47,7 @@ const initialValues = ref<LoginFormValues>({
   password: '',
 });
 
-const resolver = (e: FormResolverOptions): ResolverResult<LoginFormValues> => {
+const resolverLogin = (e: FormResolverOptions): ResolverResult<LoginFormValues> => {
   const values = e.values as LoginFormValues;
   const errors: Record<string, { type: string; message: string }> = {};
 
@@ -72,9 +75,14 @@ const resolver = (e: FormResolverOptions): ResolverResult<LoginFormValues> => {
 
 async function onFormSubmit(event: FormSubmitEvent): Promise<void> {
   if (event.valid) {
-    await authFacade.login(event.values.email, event.values.password);
-    toast.add({ severity: 'success', summary: 'Form submitted.', life: 3000 });
-    event.reset();
+    try {
+      await authFacade.login(event.values.email, event.values.password);
+      toast.add({ severity: 'success', summary: 'Form submitted.', life: 3000 });
+      event.reset();
+      await router.push('/game');
+    } catch (error) {
+      console.error("La connexion de l'utilisateur n'a pas fonctionnée.", error);
+    }
   }
 }
 </script>

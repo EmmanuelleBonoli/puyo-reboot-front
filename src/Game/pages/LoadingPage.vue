@@ -17,10 +17,12 @@ import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { AuthFacadeService } from '../../Authentication/services/auth-facade.service.ts';
 import { useRouter } from 'vue-router';
 
+const messages: string[] = ['Préparation au décollage !', "Remplissage des réserves d'oxygène", 'Départ imminent !'];
+
 const router = useRouter();
 const authFacade = new AuthFacadeService();
 const progressValue = ref(0);
-const loadingMessage = ref('Préparation au décollage !');
+const loadingMessage = ref(messages[0]);
 const interval = ref();
 
 const DURATION_MS = 8000;
@@ -49,6 +51,8 @@ const startProgress = (): void => {
     progressValue.value += STEP_INCREMENT;
     if (progressValue.value >= 100) {
       progressValue.value = 100;
+
+      // TODO: rajouter le turn des messages de chargements
       endProgress();
     }
   }, STEP_MS);

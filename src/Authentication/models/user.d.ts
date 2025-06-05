@@ -1,10 +1,13 @@
 export type User = {
   email: string;
+  playName: string;
+  avatar: string;
 };
 
 export type AuthLoginResponse = {
   token: string;
   user: User;
+  gameId: string;
 };
 
 export type AuthLoginRequest = {
@@ -15,9 +18,4 @@ export type AuthLoginRequest = {
 export type LoginFormValues = {
   email: string;
   password: string;
-};
-
-type ResolverResult<T> = {
-  values: T;
-  errors: Record<string, { type: string; message: string }>;
 };

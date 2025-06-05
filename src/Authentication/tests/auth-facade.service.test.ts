@@ -31,7 +31,6 @@ describe('AuthFacadeService', () => {
       };
       (loginUser as jest.Mock).mockResolvedValue(loginMockResponse);
 
-      // Spy on store methods
       jest.spyOn(authStore, 'setAuthData').mockImplementation(jest.fn());
 
       const result = await authFacadeService.login('test@example.com', 'password123');
@@ -44,12 +43,18 @@ describe('AuthFacadeService', () => {
 
   describe('getUser', () => {
     it('should return user if already in store', async () => {
-      jest.spyOn(authStore, 'getUser').mockReturnValue({ email: 'stored@example.com' });
-      jest.spyOn(authStore, 'getToken'); // spy without mockImplementation to check calls
+      const userTest = {
+        email: 'stored@example.com',
+        playName: 'userTest',
+        avatar: 'image avatar link',
+      };
+
+      jest.spyOn(authStore, 'getUser').mockReturnValue(userTest);
+      jest.spyOn(authStore, 'getToken');
 
       const result = await authFacadeService.getUser();
 
-      expect(result).toEqual({ email: 'stored@example.com' });
+      expect(result).toEqual(userTest);
       expect(authStore.getToken).not.toHaveBeenCalled();
     });
 

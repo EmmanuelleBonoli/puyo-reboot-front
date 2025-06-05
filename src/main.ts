@@ -15,6 +15,15 @@ app.use(PrimeVue, {
     preset: Aura,
     options: {
       darkModeSelector: true,
+      colors: {
+        primary: '#720404',
+        primaryTextColor: '#ffffff',
+        highlight: '#c60529',
+        surface: '#ffffff',
+        surfaceBorder: '#e0e0e0',
+        content: '#212121',
+        contentSecondary: '#757575',
+      },
     },
   },
 });
