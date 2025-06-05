@@ -1,18 +1,21 @@
 export type User = {
-    email: string;
-}
+  email: string;
+  playName: string;
+  avatar: string;
+};
 
 export type AuthLoginResponse = {
-    token: string;
-    user: User;
-}
+  token: string;
+  user: User;
+  gameId: string;
+};
 
 export type AuthLoginRequest = {
-    email: string;
-    password: string;
-}
+  email: string;
+  password: string;
+};
 
 export type LoginFormValues = {
-    email: string;
-    password: string;
-}
+  email: string;
+  password: string;
+};

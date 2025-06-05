@@ -1,12 +1,18 @@
-<script setup lang="ts">
-import LoginForm from "./Authentication/components/LoginForm.vue";
-
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <Toast/>
-  <LoginForm/>
+  <div class="screen-game">
+    <Toast />
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>
+.screen-game {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
 </style>

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+./scripts/husky-scripts/pre-commit/start-message.sh
+./scripts/husky-scripts/pre-commit/validate-config-files.sh
+./scripts/husky-scripts/pre-commit/validate-branch-name.sh
+./scripts/husky-scripts/pre-commit/run-prettier-and-linter.sh
+./scripts/husky-scripts/pre-commit/run-tests.sh
+./scripts/husky-scripts/final-success-message.sh

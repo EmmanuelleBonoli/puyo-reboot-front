@@ -4,7 +4,7 @@ echo
 echo_separator_general
 echo_yellow "⚡ Running Eslint..."
 echo_separator_general
-if npx ng lint; then
+if npx eslint --ext .js,.ts,.vue src; then
     echo_green "✅ Eslint passed checks"
 
     echo
