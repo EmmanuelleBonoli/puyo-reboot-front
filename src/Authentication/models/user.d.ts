@@ -2,6 +2,7 @@ export type User = {
   email: string;
   playName: string;
   avatar: string;
+  isLeftHanded: boolean;
 };
 
 export type AuthLoginResponse = {

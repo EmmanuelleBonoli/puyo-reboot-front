@@ -47,6 +47,7 @@ describe('AuthFacadeService', () => {
         email: 'stored@example.com',
         playName: 'userTest',
         avatar: 'image avatar link',
+        isLeftHanded: false,
       };
 
       jest.spyOn(authStore, 'getUser').mockReturnValue(userTest);

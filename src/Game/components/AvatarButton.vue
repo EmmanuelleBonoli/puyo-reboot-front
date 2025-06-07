@@ -1,31 +1,36 @@
-<script setup lang="ts">
-import { Button } from 'primevue';
-import { baseApiUrl } from '../../shared/models/sharedVariables.ts';
-
-const props = defineProps({
-  srcImg: String,
-  isOpenProfile: Boolean,
-});
-
-const emit = defineEmits(['update:isOpenProfile']);
-
-function openProfile(): void {
-  emit('update:isOpenProfile', !props.isOpenProfile);
-}
-</script>
-
 <template>
   <Button class="avatar" rounded variant="text" @click="openProfile">
-    <img class="avatar-img" :src="baseApiUrl + srcImg" alt="Mon Profil" />
+    <img class="avatar-img" :src="baseApiUrl + user?.avatar" alt="Mon Profil" />
   </Button>
 </template>
 
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { Button } from 'primevue';
+import { useAuthStore } from '../../Authentication/store/auth.store.ts';
+import { baseApiUrl } from '../../shared/models/sharedVariables.ts';
+import type { User } from '../../Authentication/models/user';
+
+const props = defineProps({
+  isOpenMenu: Boolean,
+});
+
+const emit = defineEmits(['update:isOpenMenu']);
+
+const authStore = useAuthStore();
+const user = ref<User | null>(null);
+
+onMounted(() => {
+  user.value = authStore.user;
+});
+
+function openProfile(): void {
+  emit('update:isOpenMenu', !props.isOpenMenu);
+}
+</script>
+
 <style scoped>
 .avatar {
-  position: fixed;
-  top: 0;
-  right: 0;
-
   .avatar-img {
     width: 50px;
     object-fit: contain;

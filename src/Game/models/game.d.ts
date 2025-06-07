@@ -1,4 +1,5 @@
 export type Game = {
+  id: string;
   statsGame: StatGame;
   bubbles: Bubble[];
 };
