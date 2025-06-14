@@ -1,11 +1,11 @@
 <template>
   <div
-    class="buttons-game"
-    :style="{
+      class="buttons-game"
+      :style="{
       justifyContent: user?.isLeftHanded ? 'flex-end' : 'flex-start',
     }">
-    <AvatarButton @click="emit('update:isOpenMenu', true)" />
-    <Button @click="emit('update:isOpenStore', true)" class="button-store" variant="outlined" rounded>
+    <AvatarButton @click="emit('update:isOpenMenu', true)"/>
+    <Button @click="openStore" class="button-store" variant="outlined" rounded>
       <i class="store-icon fa-solid fa-store"></i>
     </Button>
     <h1 class="title nabla-font">Astro Puyo</h1>
@@ -13,13 +13,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Button } from 'primevue';
+import {ref} from 'vue';
+import {Button} from 'primevue';
 import AvatarButton from './AvatarButton.vue';
-import { useAuthStore } from '../../Authentication/store/auth.store.ts';
-import type { User } from '../../Authentication/models/user';
+import {useAuthStore} from '../../Authentication/store/auth.store.ts';
+import type {User} from '../../Authentication/models/user';
 
-defineProps({
+const props = defineProps({
   isOpenMenu: Boolean,
   isOpenStore: Boolean,
 });
@@ -31,6 +31,11 @@ const emit = defineEmits<{
 
 const authStore = useAuthStore();
 const user = ref<User | null>(authStore.user);
+
+function openStore(event: Event): void {
+  event.stopPropagation();
+  emit('update:isOpenStore', !props.isOpenStore);
+}
 </script>
 
 <style scoped>

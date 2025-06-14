@@ -1,6 +1,16 @@
-import { useToast } from 'primevue/usetoast';
+import {useToast} from 'primevue/usetoast';
 
-export function toastCommonError(): void {
-  const toast = useToast();
-  toast.add({ severity: 'error', summary: 'Un problème est survenu, veuillez réessayer' });
+export function useCommonToasts(): { showToastError: () => void } {
+    const toast = useToast();
+
+    function showToastError(): void {
+        toast.add({
+            severity: 'error',
+            summary: 'Un problème est survenu, veuillez réessayer',
+        });
+    }
+
+    return {
+        showToastError,
+    };
 }

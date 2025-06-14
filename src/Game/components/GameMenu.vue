@@ -1,5 +1,5 @@
 <template>
-  <Dialog :style="{ width: '80%' }" :visible="isOpenMenu" @update:visible="updateVisible" modal dismissableMask :closable="false">
+  <Dialog :style="{ width: '80%' }" :visible="isOpenMenu" @update:visible="updateVisible" modal :closable="false">
     <template #header>
       <div class="title">
         <h2 class="nabla-font">Puyo Game</h2>
@@ -24,11 +24,12 @@
 </template>
 
 <script setup lang="ts">
-import { Dialog, Button } from 'primevue';
-import { GameFacadeService } from '../services/game-facade.service.ts';
-import { toastCommonError } from '../../shared/services/utils.ts';
+import {Dialog, Button} from 'primevue';
+import {GameFacadeService} from '../services/game-facade.service.ts';
+import {useCommonToasts} from "../../shared/services/utils.ts";
 
 const gameFacadeService = new GameFacadeService();
+const {showToastError} = useCommonToasts();
 
 defineProps({
   isOpenMenu: Boolean,
@@ -46,7 +47,7 @@ async function newGame(): Promise<void> {
     updateVisible(false);
   } catch (error) {
     console.error(error);
-    toastCommonError();
+    showToastError();
   }
 }
 
