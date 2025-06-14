@@ -2,12 +2,13 @@ export type User = {
   email: string;
   playName: string;
   avatar: string;
+  isLeftHanded: boolean;
 };
 
 export type AuthLoginResponse = {
   token: string;
   user: User;
-  gameId: string;
+  game: Game;
 };
 
 export type AuthLoginRequest = {

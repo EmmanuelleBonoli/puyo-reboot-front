@@ -1,8 +1,9 @@
 import { useAuthStore } from '../../Authentication/store/auth.store';
 import { baseApiUrl } from '../models/sharedVariables.ts';
 
-type RequestOptions = RequestInit & {
-  auth?: boolean; // besoin d’Authorization: Bearer token ?
+type RequestOptions = Omit<RequestInit, 'body'> & {
+  auth?: boolean;
+  body?: any;
 };
 
 export async function http<T>(url: string, options: RequestOptions = {}): Promise<T> {
@@ -22,6 +23,7 @@ export async function http<T>(url: string, options: RequestOptions = {}): Promis
 
   const response = await fetch(fullUrl, {
     ...options,
+    body: typeof options.body === 'object' ? JSON.stringify(options.body) : options.body,
     headers,
   });
 

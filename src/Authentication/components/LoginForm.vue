@@ -11,14 +11,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import type { FormResolverOptions, FormSubmitEvent } from '@primevue/forms';
+import { useRouter } from 'vue-router';
 import { Form } from '@primevue/forms';
-import InputField from '../../shared/components/InputField.vue';
 import { Button } from 'primevue';
+import InputField from '../../shared/components/InputField.vue';
+import { AuthFacadeService } from '../services/auth-facade.service.ts';
+import type { FormResolverOptions, FormSubmitEvent } from '@primevue/forms';
 import type { LoginFormValues } from '../models/user';
 import type { ResolverResult } from '../../shared/models/form';
-import { AuthFacadeService } from '../services/auth-facade.service.ts';
-import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const toast = useToast();
@@ -81,7 +81,8 @@ async function onFormSubmit(event: FormSubmitEvent): Promise<void> {
       event.reset();
       await router.push('/game');
     } catch (error) {
-      console.error("La connexion de l'utilisateur n'a pas fonctionnée.", error);
+      console.error(error);
+      toast.add({ severity: 'error', summary: 'Error logging in' });
     }
   }
 }
