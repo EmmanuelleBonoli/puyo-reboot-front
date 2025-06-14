@@ -1,16 +1,16 @@
-import {useToast} from 'primevue/usetoast';
+import { useToast } from 'primevue/usetoast';
 
 export function useCommonToasts(): { showToastError: () => void } {
-    const toast = useToast();
+  const toast = useToast();
 
-    function showToastError(): void {
-        toast.add({
-            severity: 'error',
-            summary: 'Un problème est survenu, veuillez réessayer',
-        });
-    }
+  function showToastError(): void {
+    toast.add({
+      severity: 'error',
+      summary: 'Un problème est survenu, veuillez réessayer',
+    });
+  }
 
-    return {
-        showToastError,
-    };
+  return {
+    showToastError,
+  };
 }

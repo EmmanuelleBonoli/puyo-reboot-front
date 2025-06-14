@@ -3,49 +3,37 @@
     <div class="grid-game">
       <div v-for="(bubble, index) in gridGame.flat()" :key="bubble ? bubble.id : 'empty-' + index" class="cell">
         <img
-            v-if="bubble"
-            :src="getBubbleImage(bubble)"
-            alt="bubble"
-            class="bubble-img"
-            :class="{ 'falling-animation': isGravityFalling(bubble) }"
-            :style="getFallStyle(bubble)"
-        />
-
+          v-if="bubble"
+          :src="getBubbleImage(bubble)"
+          alt="bubble"
+          class="bubble-img"
+          :class="{ 'falling-animation': isGravityFalling(bubble) }"
+          :style="getFallStyle(bubble)" />
       </div>
     </div>
 
     <div class="info-game">
       <div class="waiting-bubbles">
         <div class="cell">
-          <img
-              v-if="waitingBubbles"
-              :src="getBubbleImage(waitingBubbles.satellite)"
-              alt="bubble"
-              class="bubble-img"
-          />
+          <img v-if="waitingBubbles" :src="getBubbleImage(waitingBubbles.satellite)" alt="bubble" class="bubble-img" />
         </div>
         <div class="cell">
-          <img
-              v-if="waitingBubbles"
-              :src="getBubbleImage(waitingBubbles.pivot)"
-              alt="bubble"
-              class="bubble-img"
-          />
+          <img v-if="waitingBubbles" :src="getBubbleImage(waitingBubbles.pivot)" alt="bubble" class="bubble-img" />
         </div>
       </div>
-      <GameDashBoard/>
+      <GameDashBoard />
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import {computed, watchEffect} from 'vue';
-import {useAuthStore} from '../../Authentication/store/auth.store.ts';
+import { computed, watchEffect } from 'vue';
+import { useAuthStore } from '../../Authentication/store/auth.store.ts';
 
 import GameDashBoard from './GameDashBoard.vue';
-import {useGameStore} from "../store/game.store.ts";
-import {type Bubble, type BubblePair, type FallStyle, type GridGame} from "../models/game.types.ts";
-import {placeBubblesOnGridGame, getBubbleImage, getMatchingGroup} from "../utils/bubble.utils.ts";
-import {GameFacadeService} from "../services/game-facade.service.ts";
+import { useGameStore } from '../store/game.store.ts';
+import { type Bubble, type BubblePair, type FallStyle, type GridGame } from '../models/game.types.ts';
+import { placeBubblesOnGridGame, getBubbleImage, getMatchingGroup } from '../utils/bubble.utils.ts';
+import { GameFacadeService } from '../services/game-facade.service.ts';
 
 const props = defineProps({
   isGamePlayOn: Boolean,
@@ -55,14 +43,16 @@ const authStore = useAuthStore();
 const gameStore = useGameStore();
 const gameFacadeService = new GameFacadeService();
 
-const restingBubbles = computed<Bubble[]>(() => gameStore.getRestingBubbles())
-const waitingBubbles = computed<BubblePair | null>(() => gameStore.getWaitingBubbles())
-const fallingBubbles = computed<BubblePair | null>(() => gameStore.getFallingBubbles())
+const restingBubbles = computed<Bubble[]>(() => gameStore.getRestingBubbles());
+const waitingBubbles = computed<BubblePair | null>(() => gameStore.getWaitingBubbles());
+const fallingBubbles = computed<BubblePair | null>(() => gameStore.getFallingBubbles());
 
 const gridGame = computed<GridGame>(() => {
   const gridCopy = gameStore.getGridGame().map(row => row.map(cell => cell));
 
-  const bubblesOnGrid = fallingBubbles.value ? [...restingBubbles.value, fallingBubbles.value.satellite, fallingBubbles.value.pivot] : [...restingBubbles.value];
+  const bubblesOnGrid = fallingBubbles.value
+    ? [...restingBubbles.value, fallingBubbles.value.satellite, fallingBubbles.value.pivot]
+    : [...restingBubbles.value];
   placeBubblesOnGridGame(bubblesOnGrid, gridCopy);
 
   return gridCopy;
@@ -97,9 +87,7 @@ watchEffect(async () => {
     }
   }
 });
-
 </script>
-
 
 <style scoped>
 .game-container {

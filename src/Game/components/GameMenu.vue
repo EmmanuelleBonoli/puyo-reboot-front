@@ -24,12 +24,12 @@
 </template>
 
 <script setup lang="ts">
-import {Dialog, Button} from 'primevue';
-import {GameFacadeService} from '../services/game-facade.service.ts';
-import {useCommonToasts} from "../../shared/services/utils.ts";
+import { Dialog, Button } from 'primevue';
+import { GameFacadeService } from '../services/game-facade.service.ts';
+import { useCommonToasts } from '../../shared/services/utils.ts';
 
 const gameFacadeService = new GameFacadeService();
-const {showToastError} = useCommonToasts();
+const { showToastError } = useCommonToasts();
 
 defineProps({
   isOpenMenu: Boolean,

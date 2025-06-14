@@ -1,10 +1,10 @@
 <template>
   <div
-      class="buttons-game"
-      :style="{
+    class="buttons-game"
+    :style="{
       justifyContent: user?.isLeftHanded ? 'flex-end' : 'flex-start',
     }">
-    <AvatarButton @click="emit('update:isOpenMenu', true)"/>
+    <AvatarButton @click="emit('update:isOpenMenu', true)" />
     <Button @click="openStore" class="button-store" variant="outlined" rounded>
       <i class="store-icon fa-solid fa-store"></i>
     </Button>
@@ -13,11 +13,11 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue';
-import {Button} from 'primevue';
+import { ref } from 'vue';
+import { Button } from 'primevue';
 import AvatarButton from './AvatarButton.vue';
-import {useAuthStore} from '../../Authentication/store/auth.store.ts';
-import type {User} from '../../Authentication/models/user';
+import { useAuthStore } from '../../Authentication/store/auth.store.ts';
+import type { User } from '../../Authentication/models/user';
 
 const props = defineProps({
   isOpenMenu: Boolean,

@@ -1,15 +1,15 @@
 <template>
   <Button class="avatar" rounded variant="text" @click="openProfile">
-    <img class="avatar-img" :src="baseApiUrl + user?.avatar" alt="Mon Profil"/>
+    <img class="avatar-img" :src="baseApiUrl + user?.avatar" alt="Mon Profil" />
   </Button>
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted} from 'vue';
-import {Button} from 'primevue';
-import {useAuthStore} from '../../Authentication/store/auth.store.ts';
-import {baseApiUrl} from '../../shared/models/sharedVariables.ts';
-import type {User} from '../../Authentication/models/user';
+import { ref, onMounted } from 'vue';
+import { Button } from 'primevue';
+import { useAuthStore } from '../../Authentication/store/auth.store.ts';
+import { baseApiUrl } from '../../shared/models/sharedVariables.ts';
+import type { User } from '../../Authentication/models/user';
 
 const props = defineProps({
   isOpenMenu: Boolean,

@@ -1,6 +1,6 @@
 export enum BubbleSatelliteOrientationEnum {
-    UP = "UP",
-    RIGHT = "RIGHT",
-    DOWN = "DOWN",
-    LEFT = "LEFT"
+  UP = 'UP',
+  RIGHT = 'RIGHT',
+  DOWN = 'DOWN',
+  LEFT = 'LEFT',
 }
