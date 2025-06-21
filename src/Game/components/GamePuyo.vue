@@ -2,13 +2,11 @@
   <div class="game-container" :class="authStore.user?.isLeftHanded ? 'left-handed' : 'right-handed'">
     <div class="grid-game">
       <div v-for="(bubble, index) in gridGame.flat()" :key="bubble ? bubble.id : 'empty-' + index" class="cell">
-        <img
-          v-if="bubble"
-          :src="getBubbleImage(bubble)"
-          alt="bubble"
-          class="bubble-img"
-          :class="{ 'falling-animation': isGravityFalling(bubble) }"
-          :style="getFallStyle(bubble)" />
+        <img v-if="bubble" :src="getBubbleImage(bubble)" alt="bubble" class="bubble-img" />
+        <!--            :class="{-->
+        <!--              'falling-animation': isGravityFalling(bubble) || isMainFalling(bubble)-->
+        <!--            }"-->
+        <!--            :style="getFallStyle(bubble)"-->
       </div>
     </div>
 
@@ -26,13 +24,18 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, watchEffect } from 'vue';
+import { computed, watch, watchEffect } from 'vue';
 import { useAuthStore } from '../../Authentication/store/auth.store.ts';
 
 import GameDashBoard from './GameDashBoard.vue';
 import { useGameStore } from '../store/game.store.ts';
-import { type Bubble, type BubblePair, type FallStyle, type GridGame } from '../models/game.types.ts';
-import { placeBubblesOnGridGame, getBubbleImage, getMatchingGroup } from '../utils/bubble.utils.ts';
+import type {
+  Bubble,
+  BubblePair,
+  // FallStyle,
+  GridGame,
+} from '../models/game.types.ts';
+import { getBubbleImage, getMatchingGroup } from '../utils/bubble.utils.ts';
 import { GameFacadeService } from '../services/game-facade.service.ts';
 
 const props = defineProps({
@@ -48,40 +51,59 @@ const waitingBubbles = computed<BubblePair | null>(() => gameStore.getWaitingBub
 const fallingBubbles = computed<BubblePair | null>(() => gameStore.getFallingBubbles());
 
 const gridGame = computed<GridGame>(() => {
-  const gridCopy = gameStore.getGridGame().map(row => row.map(cell => cell));
-
   const bubblesOnGrid = fallingBubbles.value
     ? [...restingBubbles.value, fallingBubbles.value.satellite, fallingBubbles.value.pivot]
     : [...restingBubbles.value];
-  placeBubblesOnGridGame(bubblesOnGrid, gridCopy);
-
-  return gridCopy;
+  return gameFacadeService.updateGridGame(bubblesOnGrid);
 });
 
 const matchBubbles = computed<Bubble[]>(() => {
   return getMatchingGroup(gridGame.value);
 });
 
-function isGravityFalling(bubble: Bubble): boolean {
-  return gameStore.isGravityFallingBubble(bubble.id);
-}
+// function isGravityFalling(bubble: Bubble): boolean {
+//   return gameStore.isGravityFallingBubble(bubble.id);
+// }
 
-function getFallStyle(bubble: Bubble): FallStyle {
-  const distance = gameStore.getFallDistanceForBubble(bubble.id);
-  if (!distance) return {};
+// function isMainFalling(bubble: Bubble): boolean {
+//   const falling = gameStore.getFallingBubbles();
+//   return falling?.pivot.id === bubble.id || falling?.satellite.id === bubble.id;
+// }
 
-  const distancePx = distance * 50;
+// function getFallStyle(bubble: Bubble): FallStyle {
+// if (isMainFalling(bubble)) {
+//   return {
+//     transform: `translateY(-50px)`,
+//     animation: `fall 0.5s ease-out`,
+//   };
+// }
 
-  return {
-    transform: `translateY(-${distancePx}px)`,
-    animation: `fall ${0.05 + distance * 0.05}s ease-out`,
-  };
-}
+//   const distance = gameStore.getFallDistanceForBubble(bubble.id);
+//   if (!distance) return {transform: '', animation: ''};
+//
+//   const distancePx = distance * 50;
+//   return {
+//     transform: `translateY(-${distancePx}px)`,
+//     animation: `fall ${0.05 + distance * 0.05}s ease-out`,
+//   };
+// }
+
+watch(
+  () => props.isGamePlayOn,
+  async isGamePlayOn => {
+    if (isGamePlayOn) {
+      await gameFacadeService.gameOn();
+    } else {
+      gameFacadeService.pauseGame();
+    }
+  },
+  { immediate: true }
+);
 
 watchEffect(async () => {
   if (props.isGamePlayOn) {
     if (matchBubbles.value.length > 0) {
-      await gameFacadeService.deleteBubbles(matchBubbles.value);
+      gameFacadeService.deleteBubbles(matchBubbles.value);
       // gameStore.incrementScore(matchBubbles.value.length);
       await gameFacadeService.applyGravity();
     }

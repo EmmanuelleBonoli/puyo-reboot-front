@@ -8,6 +8,7 @@ export const COLS_GRID_GAME: number = 6;
 export const MIN_MATCHING_BUBBLE: number = 3;
 
 export const GRAVITY_ANIMATION_DELAY_MS = 250;
+export const FALLING_BUBBLES_DELAY_MS = 2000;
 
 export type GridGame = (Bubble | null)[][];
 
@@ -36,8 +37,8 @@ export type Game = {
   id: string;
   statsGame: StatsGame;
   restingBubbles: Bubble[];
-  waitingBubbles: BubblePair;
-  fallingBubbles: BubblePair;
+  waitingBubbles: BubblePair | null;
+  fallingBubbles: BubblePair | null;
 };
 
 export type StatsGame = {
