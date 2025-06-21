@@ -1,42 +1,72 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { type Bubble, type BubblePair, COLS_GRID_GAME, type Game, type GridGame, ROWS_GRID_GAME } from '../models/game.types.ts';
+import { BubbleStatusEnum } from '../models/BubbleStatusEnum.ts';
 
 export const useGameStore = defineStore('game', () => {
   const gridGame = ref<GridGame>(Array.from({ length: ROWS_GRID_GAME }, () => Array<Bubble | null>(COLS_GRID_GAME).fill(null)));
   const game = ref<Game | null>(null);
+  const gameIsOn = ref<boolean>(false);
+  const isGameOver = ref<boolean>(false);
 
   const gravityFallingBubbles = ref<Set<string>>(new Set());
   const gravityFallDistanceBubbles = ref<Record<string, number>>({});
-
-  // const restingBubbles = ref<Bubble[] | []>([]);
-  // const waitingBubbles = ref<BubblePair | null>(null);
-  // const fallingBubbles = ref<BubblePair | null>(null);
 
   function getGridGame(): GridGame {
     return gridGame.value;
   }
 
-  function setGridGame(dataGrid: GridGame): void {
-    gridGame.value = dataGrid;
+  function getIsGameOver(): boolean {
+    return isGameOver.value;
+  }
+
+  function setIsGameOver(isOver: boolean): void {
+    isGameOver.value = isOver;
+  }
+
+  function getGameIsOn(): boolean {
+    return gameIsOn.value;
+  }
+
+  function setGameIsOn(isOn: boolean): void {
+    gameIsOn.value = isOn;
+  }
+
+  function getGridGameWithoutFallingBubbles(): GridGame {
+    return gridGame.value.map(row => row.map(cell => (cell && cell.status !== BubbleStatusEnum.FALLING ? cell : null)));
+  }
+
+  function setGridGame(newGrid: GridGame): void {
+    gridGame.value = newGrid;
   }
 
   function getGame(): Game | null {
     return game.value;
   }
 
-  function setFallingBubbles(dataFallingBubbles: BubblePair): void {
+  function setGame(dataGame: Game): void {
+    game.value = dataGame;
+  }
+
+  function setFallingBubbles(dataFallingBubbles: BubblePair | null): void {
     if (game.value) {
       game.value.fallingBubbles = dataFallingBubbles;
     }
   }
 
-  function setGame(dataGame: Game): void {
-    game.value = dataGame;
+  function setWaitingBubbles(dataWaitingBubbles: BubblePair | null): void {
+    if (game.value) {
+      game.value.waitingBubbles = dataWaitingBubbles;
+    }
   }
 
   function getRestingBubbles(): Bubble[] {
     return game.value?.restingBubbles ?? [];
+  }
+
+  function addRestingBubbles(bubbles: Bubble[]): void {
+    if (!game.value) return;
+    game.value.restingBubbles.push(...bubbles);
   }
 
   function getWaitingBubbles(): BubblePair | null {
@@ -86,17 +116,22 @@ export const useGameStore = defineStore('game', () => {
         game.value.restingBubbles[index] = updatedBubble;
       }
     }
-    // game.value.restingBubbles = [...game.value.restingBubbles];
   }
 
   return {
     game,
+    getIsGameOver,
+    setIsGameOver,
+    getGameIsOn,
+    setGameIsOn,
     getGridGame,
     setGridGame,
+    getGridGameWithoutFallingBubbles,
     getRestingBubbles,
     getWaitingBubbles,
     getFallingBubbles,
     setFallingBubbles,
+    setWaitingBubbles,
     setGravityFallingBubbles,
     clearGravityFallingBubbles,
     isGravityFallingBubble,
@@ -107,5 +142,6 @@ export const useGameStore = defineStore('game', () => {
     getGame,
     setGame,
     deleteBubbles,
+    addRestingBubbles,
   };
 });

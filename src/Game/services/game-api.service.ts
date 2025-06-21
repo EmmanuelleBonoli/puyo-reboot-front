@@ -8,25 +8,10 @@ export async function deleteOldGameAndReturnNewOne(gameId: string): Promise<Game
   });
 }
 
-export async function deleteBubbles(gameId: string, bubblesId: string[]): Promise<boolean> {
-  return http<boolean>(`/game/${gameId}/bubbles`, {
-    method: 'DELETE',
-    body: bubblesId,
-    auth: true,
-  });
-}
-
-export async function updateBubblesOnServer(gameId: string, bubblesToMove: Bubble[]): Promise<boolean> {
-  return http<boolean>(`/game/${gameId}/bubbles`, {
-    method: 'PUT',
-    body: bubblesToMove,
-    auth: true,
-  });
-}
-
-export async function getWaitingBubblesFromServer(gameId: string): Promise<BubblePair> {
-  return http<BubblePair>(`/game/${gameId}/generateBubbles`, {
-    method: 'GET',
+export async function getWaitingBubblesFromServer(gameId: string, restingBubbles: Bubble[]): Promise<BubblePair> {
+  return http<BubblePair>(`/bubble/game/${gameId}/generateBubbles`, {
+    method: 'POST',
+    body: restingBubbles,
     auth: true,
   });
 }

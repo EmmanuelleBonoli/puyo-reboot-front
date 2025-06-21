@@ -1,5 +1,6 @@
 import {
   type Bubble,
+  type BubblePair,
   type BubblePosition,
   COLS_GRID_GAME,
   DIRECTIONS_GAME,
@@ -11,15 +12,25 @@ import {
 } from '../models/game.types.ts';
 import { BubbleTypeEnum } from '../models/BubbleTypeEnum.ts';
 import { BubbleSatelliteOrientationEnum } from '../models/BubbleSatelliteOrientationEnum.ts';
+import { OrientationMoveEnum } from '../models/OrientationMoveEnum.ts';
 
 export function getCellKey(row: number, col: number): string {
   return `${row},${col}`;
 }
 
+export function removeBubblesOnGridGame(bubbles: Bubble[], grid: GridGame): void {
+  for (const bubble of bubbles) {
+    if (isInsideGrid(bubble.position)) {
+      const { rowIndex, columnIndex } = bubble.position;
+      grid[rowIndex][columnIndex] = null;
+    }
+  }
+}
+
 export function placeBubblesOnGridGame(bubbles: Bubble[], grid: GridGame): void {
   for (const bubble of bubbles) {
-    const { rowIndex, columnIndex } = bubble.position;
-    if (rowIndex >= 0 && rowIndex < ROWS_GRID_GAME && columnIndex >= 0 && columnIndex < COLS_GRID_GAME) {
+    if (isInsideGrid(bubble.position)) {
+      const { rowIndex, columnIndex } = bubble.position;
       grid[rowIndex][columnIndex] = bubble;
     }
   }
@@ -49,7 +60,6 @@ export function getMatchingGroup(grid: GridGame): Bubble[] {
       }
     }
   }
-
   return [];
 }
 
@@ -70,12 +80,12 @@ export function getNextOrientation(orientation: BubbleSatelliteOrientationEnum):
   return next;
 }
 
-export function isInsideGrid(position: BubblePosition, grid: GridGame): boolean {
-  return position.rowIndex >= 0 && position.rowIndex < grid.length && position.columnIndex >= 0 && position.columnIndex < grid[0].length;
+export function isInsideGrid(position: BubblePosition): boolean {
+  return position.rowIndex >= 0 && position.rowIndex < ROWS_GRID_GAME && position.columnIndex >= 0 && position.columnIndex < COLS_GRID_GAME;
 }
 
 export function isEmptyPosition(bubblePosition: BubblePosition, gridGame: GridGame): boolean {
-  if (!isInsideGrid(bubblePosition, gridGame)) return false;
+  if (!isInsideGrid(bubblePosition)) return false;
   return gridGame[bubblePosition.rowIndex][bubblePosition.columnIndex] === null;
 }
 
@@ -111,7 +121,6 @@ export function computeGravityMovements(bubblesByCol: Record<number, Bubble[]>):
       nextFreeRow++;
     }
   }
-
   return bubblesToMove;
 }
 
@@ -128,30 +137,62 @@ export function computeGravityDistances(updated: Bubble[], original: Bubble[]): 
 }
 
 function findMatchingGroup(grid: GridGame, startRow: number, startCol: number, visited: Set<string>): Bubble[] {
-  const matchingGroup: Bubble[] = [];
-  const targetBubble = grid[startRow][startCol];
+  const group: Bubble[] = [];
+  const origin = grid[startRow][startCol];
 
-  if (!targetBubble || targetBubble.type !== BubbleTypeEnum.NORMAL) return matchingGroup;
+  if (!origin || origin.type !== BubbleTypeEnum.NORMAL) {
+    return group;
+  }
 
+  const targetColor = origin.color;
   const stack: [number, number][] = [[startRow, startCol]];
-  const targetColor = targetBubble.color;
 
   while (stack.length > 0) {
     const [row, col] = stack.pop()!;
-    const key = getCellKey(row, col);
+    const key = `${row},${col}`;
 
-    if (!isInsideGrid({ rowIndex: row, columnIndex: col }, grid) || visited.has(key)) continue;
+    const isAlreadyVisited = visited.has(key);
+    const isValidPosition = isInsideGrid({ rowIndex: row, columnIndex: col });
+    const bubble = isValidPosition ? grid[row][col] : null;
 
-    const bubble = grid[row][col];
-    if (!bubble || bubble.color !== targetColor || bubble.type !== BubbleTypeEnum.NORMAL) continue;
+    const isMatch = bubble && bubble.type === BubbleTypeEnum.NORMAL && bubble.color === targetColor;
+
+    if (!isValidPosition || isAlreadyVisited || !isMatch) {
+      // Ne remplis pas les conditions, on passe à l'élément suivant dans la pile
+      continue;
+    }
 
     visited.add(key);
-    matchingGroup.push(bubble);
+    group.push(bubble);
 
     for (const [dRow, dCol] of DIRECTIONS_GAME) {
       stack.push([row + dRow, col + dCol]);
     }
   }
+  return group;
+}
 
-  return matchingGroup;
+export function isFreeOfMovement(fallingBubbles: BubblePair, gridGame: GridGame, orientationMove: OrientationMoveEnum): boolean {
+  if (!fallingBubbles) return true;
+
+  const positions = [fallingBubbles.pivot.position, fallingBubbles.satellite.position];
+
+  const nextPositions = positions.map(pos => ({
+    rowIndex: orientationMove === OrientationMoveEnum.down ? pos.rowIndex - 1 : pos.rowIndex,
+    columnIndex:
+      orientationMove === OrientationMoveEnum.down
+        ? pos.columnIndex
+        : orientationMove === OrientationMoveEnum.left
+          ? pos.columnIndex - 1
+          : pos.columnIndex + 1,
+  }));
+
+  for (const pos of nextPositions) {
+    // Bloque si en dehors de la grille
+    if (!isInsideGrid(pos)) return false;
+
+    // Bloque si une case est déjà occupée dans la grille
+    if (!isEmptyPosition(pos, gridGame)) return false;
+  }
+  return true;
 }
