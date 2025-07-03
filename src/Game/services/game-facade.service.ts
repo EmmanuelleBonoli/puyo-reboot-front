@@ -2,7 +2,6 @@ import { useRouter } from 'vue-router';
 import { useGameStore } from '../store/game.store.ts';
 import { deleteOldGameAndReturnNewOne, getWaitingBubblesFromServer } from './game-api.service.ts';
 import {
-  computeGravityDistances,
   computeGravityMovements,
   getNextOrientation,
   getNextSatellitePosition,
@@ -12,22 +11,22 @@ import {
   placeBubblesOnGridGame,
   removeBubblesOnGridGame,
 } from '../utils/bubble.utils.ts';
-import { type Bubble, type BubblePair, FALLING_BUBBLES_DELAY_MS, GRAVITY_ANIMATION_DELAY_MS, type GridGame } from '../models/game.types.ts';
+import { type Bubble, type BubblePair, FALLING_BUBBLES_DELAY_MS, type GridGame } from '../models/game.types.ts';
 import { BubbleStatusEnum } from '../models/BubbleStatusEnum.ts';
 import { OrientationMoveEnum } from '../models/OrientationMoveEnum.ts';
 
 export class GameFacadeService {
   private _gameStore = useGameStore();
   private _router = useRouter();
-  private _gameId: string | undefined = this._gameStore.getGame()?.id;
 
   async newGame(): Promise<void> {
+    const gameId = this._gameStore.getGame()?.id;
     try {
-      if (this._gameId) {
-        const newGame = await deleteOldGameAndReturnNewOne(this._gameId);
+      if (gameId) {
+        const newGame = await deleteOldGameAndReturnNewOne(gameId);
         this._gameStore.setGame(newGame);
       } else {
-        this._router.push('/');
+        await this._router.push('/');
       }
     } catch (error) {
       throw error;
@@ -35,12 +34,9 @@ export class GameFacadeService {
   }
 
   deleteBubbles(bubblesToDelete: Bubble[]): void {
+    console.log('deleteBubbles', bubblesToDelete);
     const bubblesId = bubblesToDelete.map((bubble: Bubble) => bubble.id);
-    const gridGame: GridGame = this._gameStore.getGridGame().map(row => row.map(cell => cell));
-
     this._gameStore.deleteBubbles(bubblesId);
-    removeBubblesOnGridGame(bubblesToDelete, gridGame);
-    this._gameStore.setGridGame(gridGame);
   }
 
   async applyGravity(): Promise<void> {
@@ -50,20 +46,7 @@ export class GameFacadeService {
 
     if (bubblesToMove.length === 0) return;
 
-    const distanceMap = computeGravityDistances(bubblesToMove, restingBubbles);
-    this._gameStore.setGravityFallingBubbles(Object.keys(distanceMap));
-    this._gameStore.setGravityFallDistances(distanceMap);
-
-    await new Promise(resolve => setTimeout(resolve, GRAVITY_ANIMATION_DELAY_MS));
-
-    this._gameStore.clearGravityFallingBubbles();
-    this._gameStore.clearGravityFallDistances();
-
-    const gridGame = this._gameStore.getGridGame();
-    removeBubblesOnGridGame(bubblesToMove, gridGame);
-
     this._gameStore.updatePositionBubbles(bubblesToMove);
-    this._gameStore.setGridGame(gridGame);
   }
 
   rotateSatelliteBubble(): void {
@@ -84,7 +67,6 @@ export class GameFacadeService {
         placeBubblesOnGridGame([satelliteBubble], gridGame);
 
         this._gameStore.setFallingBubbles(fallingBubbles);
-        this._gameStore.setGridGame(gridGame);
       }
     }
   }
@@ -260,7 +242,6 @@ export class GameFacadeService {
       placeBubblesOnGridGame([fallingBubbles.pivot, fallingBubbles.satellite], gridGame);
 
       this._gameStore.setFallingBubbles(fallingBubbles);
-      this._gameStore.setGridGame(gridGame);
     }
   }
 

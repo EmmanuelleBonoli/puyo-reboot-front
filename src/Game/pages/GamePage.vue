@@ -1,6 +1,7 @@
 <template>
-  <div class="page game-page" @touchstart.passive="onTouchStart" @touchmove.passive="onTouchMove" @touchend.passive="onTouchEnd">
+  <div class="page game-page" @touchstart="onTouchStart" @touchmove="onTouchMove" @touchend="onTouchEnd">
     <AnimationHeaderGame />
+
     <GamePuyo :isGamePlayOn="isGamePlayOn" />
     <FooterGame v-model:isOpenMenu="isOpenMenu" v-model:isOpenStore="isOpenStore" />
 
@@ -41,8 +42,9 @@ const isGamePlayOn = computed<boolean>(() => {
   return !isOpenMenu.value && !isOpenStore.value;
 });
 
-const isGameOver = computed<boolean>(() => {
-  return gameStore.getIsGameOver();
+const isGameOver = computed<boolean>({
+  get: () => gameStore.getIsGameOver(),
+  set: (value: boolean) => gameStore.setIsGameOver(value),
 });
 
 onMounted(async () => {
@@ -87,8 +89,15 @@ function onTouchMove(e: TouchEvent): void {
   }
 }
 
-function onTouchEnd(): void {
-  if (!hasMoved.value) {
+function onTouchEnd(e: TouchEvent): void {
+  const target = e.target as HTMLElement;
+
+  // Si l'utilisateur clique sur les menus, on ne fait rien
+  if (target.closest('.p-dialog, .menu-options, button')) {
+    return;
+  }
+
+  if (!hasMoved.value && isGamePlayOn.value) {
     gameFacade.rotateSatelliteBubble();
   }
 }

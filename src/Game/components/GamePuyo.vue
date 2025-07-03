@@ -1,12 +1,8 @@
 <template>
   <div class="game-container" :class="authStore.user?.isLeftHanded ? 'left-handed' : 'right-handed'">
     <div class="grid-game">
-      <div v-for="(bubble, index) in gridGame.flat()" :key="bubble ? bubble.id : 'empty-' + index" class="cell">
+      <div v-for="(bubble, index) in gridGame.flat()" :key="bubble?.id ?? `empty-${index}`" class="cell">
         <img v-if="bubble" :src="getBubbleImage(bubble)" alt="bubble" class="bubble-img" />
-        <!--            :class="{-->
-        <!--              'falling-animation': isGravityFalling(bubble) || isMainFalling(bubble)-->
-        <!--            }"-->
-        <!--            :style="getFallStyle(bubble)"-->
       </div>
     </div>
 
@@ -29,12 +25,7 @@ import { useAuthStore } from '../../Authentication/store/auth.store.ts';
 
 import GameDashBoard from './GameDashBoard.vue';
 import { useGameStore } from '../store/game.store.ts';
-import type {
-  Bubble,
-  BubblePair,
-  // FallStyle,
-  GridGame,
-} from '../models/game.types.ts';
+import type { Bubble, BubblePair, GridGame } from '../models/game.types.ts';
 import { getBubbleImage, getMatchingGroup } from '../utils/bubble.utils.ts';
 import { GameFacadeService } from '../services/game-facade.service.ts';
 
@@ -61,33 +52,6 @@ const matchBubbles = computed<Bubble[]>(() => {
   return getMatchingGroup(gridGame.value);
 });
 
-// function isGravityFalling(bubble: Bubble): boolean {
-//   return gameStore.isGravityFallingBubble(bubble.id);
-// }
-
-// function isMainFalling(bubble: Bubble): boolean {
-//   const falling = gameStore.getFallingBubbles();
-//   return falling?.pivot.id === bubble.id || falling?.satellite.id === bubble.id;
-// }
-
-// function getFallStyle(bubble: Bubble): FallStyle {
-// if (isMainFalling(bubble)) {
-//   return {
-//     transform: `translateY(-50px)`,
-//     animation: `fall 0.5s ease-out`,
-//   };
-// }
-
-//   const distance = gameStore.getFallDistanceForBubble(bubble.id);
-//   if (!distance) return {transform: '', animation: ''};
-//
-//   const distancePx = distance * 50;
-//   return {
-//     transform: `translateY(-${distancePx}px)`,
-//     animation: `fall ${0.05 + distance * 0.05}s ease-out`,
-//   };
-// }
-
 watch(
   () => props.isGamePlayOn,
   async isGamePlayOn => {
@@ -103,6 +67,8 @@ watch(
 watchEffect(async () => {
   if (props.isGamePlayOn) {
     if (matchBubbles.value.length > 0) {
+      console.log(`Match found: ${matchBubbles.value}`);
+      await gameFacadeService.applyGravity();
       gameFacadeService.deleteBubbles(matchBubbles.value);
       // gameStore.incrementScore(matchBubbles.value.length);
       await gameFacadeService.applyGravity();

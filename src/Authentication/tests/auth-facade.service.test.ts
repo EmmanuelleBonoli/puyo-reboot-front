@@ -28,6 +28,7 @@ describe('AuthFacadeService', () => {
       const loginMockResponse = {
         token: 'mon super token',
         user: { email: 'test@example.com', id: 1 },
+        game: { id: 42, statsGame: {}, restingBubbles: [], waitingBubbles: null, fallingBubbles: null },
       };
       (loginUser as jest.Mock).mockResolvedValue(loginMockResponse);
 
@@ -67,6 +68,7 @@ describe('AuthFacadeService', () => {
       (getUserWithToken as jest.Mock).mockResolvedValue({
         token: 'mon super token',
         user: { email: 'api@example.com', id: 3 },
+        game: { id: 42, statsGame: {}, restingBubbles: [], waitingBubbles: null, fallingBubbles: null },
       });
 
       const result = await authFacadeService.getUser();

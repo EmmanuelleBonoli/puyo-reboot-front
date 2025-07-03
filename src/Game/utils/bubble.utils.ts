@@ -13,6 +13,7 @@ import {
 import { BubbleTypeEnum } from '../models/BubbleTypeEnum.ts';
 import { BubbleSatelliteOrientationEnum } from '../models/BubbleSatelliteOrientationEnum.ts';
 import { OrientationMoveEnum } from '../models/OrientationMoveEnum.ts';
+import { BubbleStatusEnum } from '../models/BubbleStatusEnum.ts';
 
 export function getCellKey(row: number, col: number): string {
   return `${row},${col}`;
@@ -45,22 +46,26 @@ export function getBubbleImage(bubble: Bubble): string {
 
 export function getMatchingGroup(grid: GridGame): Bubble[] {
   const visited = new Set<string>();
+  const allMatchingGroups: Bubble[] = [];
 
   for (let row = 0; row < grid.length; row++) {
     for (let col = 0; col < grid[0].length; col++) {
       const bubble = grid[row][col];
       const key = getCellKey(row, col);
 
-      if (bubble && bubble.type === BubbleTypeEnum.NORMAL && !visited.has(key)) {
+      if (bubble && bubble.type === BubbleTypeEnum.NORMAL && !visited.has(key) && bubble.status === BubbleStatusEnum.RESTING) {
+        const localVisited = new Set<string>();
         const group = findMatchingGroup(grid, row, col, visited);
 
+        for (const k of localVisited) visited.add(k);
+
         if (group.length >= MIN_MATCHING_BUBBLE) {
-          return group;
+          allMatchingGroups.push(...group);
         }
       }
     }
   }
-  return [];
+  return allMatchingGroups;
 }
 
 export function getNextSatellitePosition(bubble: Bubble, orientation: BubbleSatelliteOrientationEnum): BubblePosition {
@@ -138,29 +143,23 @@ export function computeGravityDistances(updated: Bubble[], original: Bubble[]): 
 
 function findMatchingGroup(grid: GridGame, startRow: number, startCol: number, visited: Set<string>): Bubble[] {
   const group: Bubble[] = [];
-  const origin = grid[startRow][startCol];
+  const bubbleOnGrid = grid[startRow][startCol];
 
-  if (!origin || origin.type !== BubbleTypeEnum.NORMAL) {
-    return group;
-  }
+  if (!bubbleOnGrid || bubbleOnGrid.type !== BubbleTypeEnum.NORMAL) return group;
 
-  const targetColor = origin.color;
+  const targetColor = bubbleOnGrid.color;
   const stack: [number, number][] = [[startRow, startCol]];
 
   while (stack.length > 0) {
     const [row, col] = stack.pop()!;
     const key = `${row},${col}`;
 
-    const isAlreadyVisited = visited.has(key);
-    const isValidPosition = isInsideGrid({ rowIndex: row, columnIndex: col });
-    const bubble = isValidPosition ? grid[row][col] : null;
+    if (visited.has(key)) continue;
 
-    const isMatch = bubble && bubble.type === BubbleTypeEnum.NORMAL && bubble.color === targetColor;
+    if (!isInsideGrid({ rowIndex: row, columnIndex: col })) continue;
 
-    if (!isValidPosition || isAlreadyVisited || !isMatch) {
-      // Ne remplis pas les conditions, on passe à l'élément suivant dans la pile
-      continue;
-    }
+    const bubble = grid[row][col];
+    if (!bubble || bubble.status !== BubbleStatusEnum.RESTING || bubble.type !== BubbleTypeEnum.NORMAL || bubble.color !== targetColor) continue;
 
     visited.add(key);
     group.push(bubble);
@@ -169,6 +168,7 @@ function findMatchingGroup(grid: GridGame, startRow: number, startCol: number, v
       stack.push([row + dRow, col + dCol]);
     }
   }
+
   return group;
 }
 
