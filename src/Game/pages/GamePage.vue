@@ -1,5 +1,5 @@
 <template>
-  <div class="page game-page" @touchstart="onTouchStart" @touchmove="onTouchMove" @touchend="onTouchEnd">
+  <div class="page game-page" @touchstart.passive="onTouchStart" @touchmove.passive="onTouchMove" @touchend.passive="onTouchEnd">
     <AnimationHeaderGame />
 
     <GamePuyo :isGamePlayOn="isGamePlayOn" />

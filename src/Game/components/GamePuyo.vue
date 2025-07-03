@@ -67,14 +67,24 @@ watch(
 watchEffect(async () => {
   if (props.isGamePlayOn) {
     if (matchBubbles.value.length > 0) {
-      console.log(`Match found: ${matchBubbles.value}`);
-      await gameFacadeService.applyGravity();
-      gameFacadeService.deleteBubbles(matchBubbles.value);
-      // gameStore.incrementScore(matchBubbles.value.length);
-      await gameFacadeService.applyGravity();
+      await resolveMatchesBubbles();
     }
   }
 });
+
+async function resolveMatchesBubbles(): Promise<void> {
+  while (true) {
+    await gameFacadeService.applyGravity();
+
+    await new Promise(resolve => setTimeout(resolve, 600));
+    const currentMatches = [...matchBubbles.value];
+    if (currentMatches.length === 0) break;
+
+    gameFacadeService.deleteBubbles(currentMatches);
+
+    await new Promise(resolve => setTimeout(resolve, 400));
+  }
+}
 </script>
 
 <style scoped>
