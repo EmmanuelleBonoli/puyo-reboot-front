@@ -34,6 +34,7 @@ export class GameFacadeService {
   }
 
   deleteBubbles(bubblesToDelete: Bubble[]): void {
+    console.log('deleteBubbles', bubblesToDelete);
     const bubblesId = bubblesToDelete.map((bubble: Bubble) => bubble.id);
     this._gameStore.deleteBubbles(bubblesId);
   }
