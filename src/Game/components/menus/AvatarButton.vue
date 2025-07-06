@@ -7,9 +7,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { Button } from 'primevue';
-import { useAuthStore } from '../../Authentication/store/auth.store.ts';
-import { baseApiUrl } from '../../shared/models/sharedVariables.ts';
-import type { User } from '../../Authentication/models/user';
+import { useAuthStore } from '../../../Authentication/store/auth.store.ts';
+import { baseApiUrl } from '../../../shared/models/sharedVariables.ts';
+import type { User } from '../../../Authentication/models/user';
 
 const props = defineProps({
   isOpenMenu: Boolean,

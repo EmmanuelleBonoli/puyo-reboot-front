@@ -15,9 +15,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Button } from 'primevue';
-import AvatarButton from './AvatarButton.vue';
-import { useAuthStore } from '../../Authentication/store/auth.store.ts';
-import type { User } from '../../Authentication/models/user';
+import AvatarButton from '../menus/AvatarButton.vue';
+import { useAuthStore } from '../../../Authentication/store/auth.store.ts';
+import type { User } from '../../../Authentication/models/user';
 
 const props = defineProps({
   isOpenMenu: Boolean,
@@ -45,6 +45,7 @@ function openStore(event: Event): void {
   height: 10%;
   align-items: center;
   padding: 2%;
+  background-color: var(--primary-color);
 
   .button-store {
     border-radius: 50%;

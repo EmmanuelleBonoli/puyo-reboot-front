@@ -81,8 +81,8 @@ async function onFormSubmit(event: FormSubmitEvent): Promise<void> {
       event.reset();
       await router.push('/game');
     } catch (error) {
-      console.error(error);
-      toast.add({ severity: 'error', summary: 'Error logging in' });
+      console.error('le login a échoué : ', error);
+      toast.add({ severity: 'error', summary: 'Erreur lors de la connexion' });
     }
   }
 }

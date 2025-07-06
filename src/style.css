@@ -33,6 +33,13 @@
     'EHLT' 12;
 }
 
+@font-face {
+  font-family: 'Digital';
+  src: url('/fonts/DigitalNumbers-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .page {
   background-color: var(--background-color);
   display: flex;

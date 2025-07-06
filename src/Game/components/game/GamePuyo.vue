@@ -1,19 +1,19 @@
 <template>
   <div class="game-container" :class="authStore.user?.isLeftHanded ? 'left-handed' : 'right-handed'">
     <div class="grid-game">
-      <div v-for="(bubble, index) in gridGame.flat()" :key="bubble?.id ?? `empty-${index}`" class="cell">
-        <img v-if="bubble" :src="getBubbleImage(bubble)" alt="bubble" class="bubble-img" />
+      <div
+        v-for="cell in gridGame.flat()"
+        :key="isBubble(cell) ? `${cell.position.rowIndex}-${cell.position.columnIndex}` : `${cell.rowIndex}-${cell.columnIndex}`"
+        :id="isBubble(cell) ? `${cell.position.rowIndex}-${cell.position.columnIndex}` : `${cell.rowIndex}-${cell.columnIndex}`"
+        class="cell">
+        <img v-if="isBubble(cell)" :src="getBubbleImage(cell)" alt="bubble" class="bubble-img" />
       </div>
     </div>
 
     <div class="info-game">
       <div class="waiting-bubbles">
-        <div class="cell">
-          <img v-if="waitingBubbles" :src="getBubbleImage(waitingBubbles.satellite)" alt="bubble" class="bubble-img" />
-        </div>
-        <div class="cell">
-          <img v-if="waitingBubbles" :src="getBubbleImage(waitingBubbles.pivot)" alt="bubble" class="bubble-img" />
-        </div>
+        <img v-if="waitingBubbles" :src="getBubbleImage(waitingBubbles.satellite)" alt="bubble" class="bubble-img" />
+        <img v-if="waitingBubbles" :src="getBubbleImage(waitingBubbles.pivot)" alt="bubble" class="bubble-img" />
       </div>
       <GameDashBoard />
     </div>
@@ -21,13 +21,14 @@
 </template>
 <script setup lang="ts">
 import { computed, watch, watchEffect } from 'vue';
-import { useAuthStore } from '../../Authentication/store/auth.store.ts';
+import { useAuthStore } from '../../../Authentication/store/auth.store.ts';
 
-import GameDashBoard from './GameDashBoard.vue';
-import { useGameStore } from '../store/game.store.ts';
-import type { Bubble, BubblePair, GridGame } from '../models/game.types.ts';
-import { getBubbleImage, getMatchingGroup } from '../utils/bubble.utils.ts';
-import { GameFacadeService } from '../services/game-facade.service.ts';
+import GameDashBoard from '../dashBoard/GameDashBoard.vue';
+import { useGameStore } from '../../store/game.store.ts';
+import { type Bubble, type BubblePair, type GridGame } from '../../models/game.types.ts';
+import { getBubbleImage, getMatchingGroup, isBubble } from '../../utils/bubble.utils.ts';
+import { GameFacadeService } from '../../services/game-facade.service.ts';
+import { ScoreFacadeService } from '../../services/score-facade.service.ts';
 
 const props = defineProps({
   isGamePlayOn: Boolean,
@@ -36,6 +37,7 @@ const props = defineProps({
 const authStore = useAuthStore();
 const gameStore = useGameStore();
 const gameFacadeService = new GameFacadeService();
+const scoreFacadeService = new ScoreFacadeService();
 
 const restingBubbles = computed<Bubble[]>(() => gameStore.getRestingBubbles());
 const waitingBubbles = computed<BubblePair | null>(() => gameStore.getWaitingBubbles());
@@ -74,16 +76,28 @@ watchEffect(async () => {
 
 async function resolveMatchesBubbles(): Promise<void> {
   while (true) {
-    await gameFacadeService.applyGravity();
+    gameFacadeService.applyGravity();
 
     await new Promise(resolve => setTimeout(resolve, 600));
     const currentMatches = [...matchBubbles.value];
     if (currentMatches.length === 0) break;
-
     gameFacadeService.deleteBubbles(currentMatches);
+
+    updateScore(currentMatches.length);
+    updateOxygen(currentMatches.length);
 
     await new Promise(resolve => setTimeout(resolve, 400));
   }
+}
+
+function updateScore(matchingBubblesNumber: number): void {
+  //todo : add logic to multiply the score if there is combos chains
+  scoreFacadeService.updateScore(matchingBubblesNumber, false);
+}
+
+function updateOxygen(matchingBubblesNumber: number): void {
+  //todo : add logic to multiply the score if there is combos chains
+  scoreFacadeService.updateOxygen(matchingBubblesNumber, false);
 }
 </script>
 
@@ -118,9 +132,13 @@ async function resolveMatchesBubbles(): Promise<void> {
 
     .waiting-bubbles {
       display: grid;
+      width: 100%;
       grid-template-rows: repeat(2, 50px);
       grid-template-columns: repeat(1, 50px);
-      padding-top: 20%;
+      padding: 10%;
+      border-radius: 10px;
+      justify-content: center;
+      align-items: center;
     }
   }
 
@@ -131,7 +149,7 @@ async function resolveMatchesBubbles(): Promise<void> {
   }
 
   .cell {
-    border: 1px solid black;
+    border: 1px solid var(--surface-card);
     display: flex;
     align-items: center;
     justify-content: center;

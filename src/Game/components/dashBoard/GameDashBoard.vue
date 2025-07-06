@@ -1,12 +1,14 @@
 <template>
   <div class="game-dash">
-    <Gauge />
-    <div>Score</div>
-    <div>Timer</div>
+    <Oxygen />
+    <Inventory />
+    <Score />
   </div>
 </template>
 <script setup lang="ts">
-import Gauge from './Gauge.vue';
+import Oxygen from './Oxygen.vue';
+import Score from './Score.vue';
+import Inventory from './Inventory.vue';
 </script>
 
 <style scoped>
