@@ -37,7 +37,7 @@ export class AuthFacadeService {
       this._gameStore.setGame(response.game);
       return response.user;
     } catch (error) {
-      console.error('user not fetch', error);
+      console.error("l'utilisateur n'a pas été récupéré", error);
       this._authStore.clearAuthData();
       return null;
     }

@@ -1,5 +1,5 @@
 import { http } from '../../shared/services/http-client';
-import type { Bubble, BubblePair, Game } from '../models/game.types.ts';
+import type { BubblePair, Game, GameData } from '../models/game.types.ts';
 
 export async function deleteOldGameAndReturnNewOne(gameId: string): Promise<Game> {
   return http<Game>(`/game/${gameId}`, {
@@ -8,10 +8,10 @@ export async function deleteOldGameAndReturnNewOne(gameId: string): Promise<Game
   });
 }
 
-export async function getWaitingBubblesFromServer(gameId: string, restingBubbles: Bubble[]): Promise<BubblePair> {
+export async function getWaitingBubblesFromServer(gameId: string, gameData: GameData): Promise<BubblePair> {
   return http<BubblePair>(`/bubble/game/${gameId}/generateBubbles`, {
     method: 'POST',
-    body: restingBubbles,
+    body: gameData,
     auth: true,
   });
 }

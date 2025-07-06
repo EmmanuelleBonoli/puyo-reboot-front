@@ -1,14 +1,16 @@
 import {
   type Bubble,
   type BubblePair,
-  type BubblePosition,
+  type GridPosition,
   COLS_GRID_GAME,
-  DIRECTIONS_GAME,
   type GridGame,
   MIN_MATCHING_BUBBLE,
   NEXT_ORIENTATION_MAP,
   ROWS_GRID_GAME,
   SATELLITE_OFFSETS,
+  type GridCell,
+  DIRECTIONS_MOVEMENT_GAME,
+  DIRECTIONS_AROUND_BUBBLE,
 } from '../models/game.types.ts';
 import { BubbleTypeEnum } from '../models/BubbleTypeEnum.ts';
 import { BubbleSatelliteOrientationEnum } from '../models/BubbleSatelliteOrientationEnum.ts';
@@ -19,11 +21,15 @@ export function getCellKey(row: number, col: number): string {
   return `${row},${col}`;
 }
 
+export function isBubble(cell: GridCell): cell is Bubble {
+  return !!cell && 'status' in cell && 'color' in cell && 'type' in cell;
+}
+
 export function removeBubblesOnGridGame(bubbles: Bubble[], grid: GridGame): void {
   for (const bubble of bubbles) {
     if (isInsideGrid(bubble.position)) {
       const { rowIndex, columnIndex } = bubble.position;
-      grid[rowIndex][columnIndex] = null;
+      grid[rowIndex][columnIndex] = { rowIndex, columnIndex };
     }
   }
 }
@@ -53,7 +59,7 @@ export function getMatchingGroup(grid: GridGame): Bubble[] {
       const bubble = grid[row][col];
       const key = getCellKey(row, col);
 
-      if (bubble && bubble.type === BubbleTypeEnum.NORMAL && !visited.has(key) && bubble.status === BubbleStatusEnum.RESTING) {
+      if (isBubble(bubble) && bubble.type === BubbleTypeEnum.NORMAL && !visited.has(key) && bubble.status === BubbleStatusEnum.RESTING) {
         const localVisited = new Set<string>();
         const group = findMatchingGroup(grid, row, col, visited);
 
@@ -68,7 +74,7 @@ export function getMatchingGroup(grid: GridGame): Bubble[] {
   return allMatchingGroups;
 }
 
-export function getNextSatellitePosition(bubble: Bubble, orientation: BubbleSatelliteOrientationEnum): BubblePosition {
+export function getNextSatellitePosition(bubble: Bubble, orientation: BubbleSatelliteOrientationEnum): GridPosition {
   const offset = SATELLITE_OFFSETS[orientation];
   if (!offset) throw new Error(`Invalid orientation: ${orientation}`);
 
@@ -85,13 +91,13 @@ export function getNextOrientation(orientation: BubbleSatelliteOrientationEnum):
   return next;
 }
 
-export function isInsideGrid(position: BubblePosition): boolean {
+export function isInsideGrid(position: GridPosition): boolean {
   return position.rowIndex >= 0 && position.rowIndex < ROWS_GRID_GAME && position.columnIndex >= 0 && position.columnIndex < COLS_GRID_GAME;
 }
 
-export function isEmptyPosition(bubblePosition: BubblePosition, gridGame: GridGame): boolean {
-  if (!isInsideGrid(bubblePosition)) return false;
-  return gridGame[bubblePosition.rowIndex][bubblePosition.columnIndex] === null;
+export function isEmptyPosition(position: GridPosition, gridGame: GridGame): boolean {
+  const cell = gridGame[position.rowIndex]?.[position.columnIndex];
+  return !isBubble(cell);
 }
 
 export function groupBubblesByColumn(bubbles: Bubble[]): Record<number, Bubble[]> {
@@ -145,7 +151,7 @@ function findMatchingGroup(grid: GridGame, startRow: number, startCol: number, v
   const group: Bubble[] = [];
   const bubbleOnGrid = grid[startRow][startCol];
 
-  if (!bubbleOnGrid || bubbleOnGrid.type !== BubbleTypeEnum.NORMAL) return group;
+  if (!isBubble(bubbleOnGrid) || (isBubble(bubbleOnGrid) && bubbleOnGrid.type !== BubbleTypeEnum.NORMAL)) return group;
 
   const targetColor = bubbleOnGrid.color;
   const stack: [number, number][] = [[startRow, startCol]];
@@ -159,12 +165,16 @@ function findMatchingGroup(grid: GridGame, startRow: number, startCol: number, v
     if (!isInsideGrid({ rowIndex: row, columnIndex: col })) continue;
 
     const bubble = grid[row][col];
-    if (!bubble || bubble.status !== BubbleStatusEnum.RESTING || bubble.type !== BubbleTypeEnum.NORMAL || bubble.color !== targetColor) continue;
+    if (
+      !isBubble(bubble) ||
+      (isBubble(bubble) && (bubble.status !== BubbleStatusEnum.RESTING || bubble.type !== BubbleTypeEnum.NORMAL || bubble.color !== targetColor))
+    )
+      continue;
 
     visited.add(key);
     group.push(bubble);
 
-    for (const [dRow, dCol] of DIRECTIONS_GAME) {
+    for (const [dRow, dCol] of DIRECTIONS_MOVEMENT_GAME) {
       stack.push([row + dRow, col + dCol]);
     }
   }
@@ -195,4 +205,22 @@ export function isFreeOfMovement(fallingBubbles: BubblePair, gridGame: GridGame,
     if (!isEmptyPosition(pos, gridGame)) return false;
   }
   return true;
+}
+
+export function findBubblesAroundPosition(position: GridPosition, gridGame: GridGame): Bubble[] {
+  const bubbles: Bubble[] = [];
+
+  for (const [dRow, dCol] of DIRECTIONS_AROUND_BUBBLE) {
+    const newRow = position.rowIndex + dRow;
+    const newCol = position.columnIndex + dCol;
+
+    if (isInsideGrid({ rowIndex: newRow, columnIndex: newCol })) {
+      const cell = gridGame[newRow][newCol];
+      if (isBubble(cell)) {
+        bubbles.push(cell);
+      }
+    }
+  }
+
+  return bubbles;
 }

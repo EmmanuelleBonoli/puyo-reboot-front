@@ -6,12 +6,21 @@ import {
   getNextOrientation,
   getNextSatellitePosition,
   groupBubblesByColumn,
+  isBubble,
   isEmptyPosition,
   isFreeOfMovement,
+  isInsideGrid,
   placeBubblesOnGridGame,
   removeBubblesOnGridGame,
 } from '../utils/bubble.utils.ts';
-import { type Bubble, type BubblePair, FALLING_BUBBLES_DELAY_MS, type GridGame } from '../models/game.types.ts';
+import {
+  type Bubble,
+  type BubblePair,
+  FALLING_BUBBLES_DELAY_MS,
+  type GameData,
+  type GridGame,
+  OPPOSITE_ORIENTATION_MAP,
+} from '../models/game.types.ts';
 import { BubbleStatusEnum } from '../models/BubbleStatusEnum.ts';
 import { OrientationMoveEnum } from '../models/OrientationMoveEnum.ts';
 
@@ -20,7 +29,7 @@ export class GameFacadeService {
   private _router = useRouter();
 
   async newGame(): Promise<void> {
-    const gameId = this._gameStore.getGame()?.id;
+    const gameId = this._gameStore.getGame().id;
     try {
       if (gameId) {
         const newGame = await deleteOldGameAndReturnNewOne(gameId);
@@ -34,12 +43,11 @@ export class GameFacadeService {
   }
 
   deleteBubbles(bubblesToDelete: Bubble[]): void {
-    console.log('deleteBubbles', bubblesToDelete);
     const bubblesId = bubblesToDelete.map((bubble: Bubble) => bubble.id);
     this._gameStore.deleteBubbles(bubblesId);
   }
 
-  async applyGravity(): Promise<void> {
+  applyGravity(): void {
     const restingBubbles = this._gameStore.getRestingBubbles();
     const bubblesByCol = groupBubblesByColumn(restingBubbles);
     const bubblesToMove = computeGravityMovements(bubblesByCol);
@@ -55,20 +63,36 @@ export class GameFacadeService {
     const satelliteBubble: Bubble | undefined = fallingBubbles?.satellite;
 
     if (fallingBubbles && satelliteBubble) {
-      const nextPosition = getNextSatellitePosition(satelliteBubble, fallingBubbles.orientation);
-      const isAvailablePosition = isEmptyPosition(nextPosition, gridGame);
+      let nextPosition = getNextSatellitePosition(satelliteBubble, fallingBubbles.orientation);
+      let nextPositionIsInsideGrid = isInsideGrid(nextPosition);
+      let isAvailablePosition = isEmptyPosition(nextPosition, gridGame);
 
-      if (isAvailablePosition) {
+      if (!nextPositionIsInsideGrid) {
+        // on switch entre la satellite et la pivot
+        const pivotBubble: Bubble = fallingBubbles.pivot;
+        fallingBubbles.pivot = satelliteBubble;
+        fallingBubbles.satellite = pivotBubble;
+        fallingBubbles.orientation = OPPOSITE_ORIENTATION_MAP[fallingBubbles.orientation];
+        nextPosition = getNextSatellitePosition(fallingBubbles.satellite, fallingBubbles.orientation);
+        nextPositionIsInsideGrid = isInsideGrid(nextPosition);
+        isAvailablePosition = isEmptyPosition(nextPosition, gridGame);
+      }
+
+      if (isAvailablePosition && nextPositionIsInsideGrid) {
         removeBubblesOnGridGame([satelliteBubble], gridGame);
 
-        satelliteBubble.position = nextPosition;
+        fallingBubbles.satellite.position = nextPosition;
         fallingBubbles.orientation = getNextOrientation(fallingBubbles.orientation);
 
-        placeBubblesOnGridGame([satelliteBubble], gridGame);
+        placeBubblesOnGridGame([fallingBubbles.satellite], gridGame);
 
         this._gameStore.setFallingBubbles(fallingBubbles);
       }
     }
+  }
+
+  isPlayingGame(): boolean {
+    return this._gameStore.getGameIsOn();
   }
 
   pauseGame(): void {
@@ -131,7 +155,7 @@ export class GameFacadeService {
 
     // 5. Mise au repos et on recommence
     this.promoteFallingBubbles();
-    await this.applyGravity();
+    this.applyGravity();
     await this.gameOn();
   }
 
@@ -170,7 +194,12 @@ export class GameFacadeService {
 
   async generatingWaitingBubbles(gameId: string): Promise<void> {
     try {
-      const newWaiting = await getWaitingBubblesFromServer(gameId, this._gameStore.getRestingBubbles());
+      const gameData: GameData = {
+        restingBubbles: this._gameStore.getRestingBubbles(),
+        statsGame: this._gameStore.game.statsGame,
+      };
+
+      const newWaiting = await getWaitingBubblesFromServer(gameId, gameData);
       this._gameStore.setWaitingBubbles(newWaiting);
     } catch (error) {
       console.error('Erreur lors de la récupération des bulles en attente :', error);
@@ -198,7 +227,12 @@ export class GameFacadeService {
   }
 
   updateGridGame(bubblesToDisplay: Bubble[]): GridGame {
-    const gridCopy = this._gameStore.getGridGame().map(row => row.map(() => null));
+    const gridCopy = this._gameStore.getGridGame().map((row, rowIndex) =>
+      row.map((_, columnIndex) => ({
+        rowIndex,
+        columnIndex,
+      }))
+    );
     placeBubblesOnGridGame(bubblesToDisplay, gridCopy);
     this._gameStore.setGridGame(gridCopy);
     return gridCopy;
@@ -222,7 +256,7 @@ export class GameFacadeService {
         this.moveOneStepDownFallingBubbles(fallingBubbles);
         break;
       default:
-        console.warn(`Unknown orientation move: ${orientationMove}`);
+        console.error(`Orientation inconnue: ${orientationMove}`);
     }
   }
 
@@ -254,8 +288,12 @@ export class GameFacadeService {
     ];
 
     return entryPositions.some(pos => {
-      const bubble = grid[pos.rowIndex]?.[pos.columnIndex];
-      return bubble?.status === BubbleStatusEnum.RESTING;
+      const cell = grid[pos.rowIndex]?.[pos.columnIndex];
+      return isBubble(cell) && cell.status === BubbleStatusEnum.RESTING;
     });
+  }
+
+  setIsGameOver(isOver: boolean): void {
+    this._gameStore.setIsGameOver(isOver);
   }
 }

@@ -22,8 +22,8 @@
 
 <script setup lang="ts">
 import { Button, Dialog } from 'primevue';
-import { GameFacadeService } from '../services/game-facade.service.ts';
-import { useCommonToasts } from '../../shared/services/utils.ts';
+import { GameFacadeService } from '../../services/game-facade.service.ts';
+import { useCommonToasts } from '../../../shared/services/utils.ts';
 
 const gameFacadeService = new GameFacadeService();
 const { showToastError } = useCommonToasts();
@@ -43,7 +43,7 @@ async function newGame(): Promise<void> {
     await gameFacadeService.newGame();
     updateVisible(false);
   } catch (error) {
-    console.error(error);
+    console.error("Une nouvelle partie n'a pas pu être chargée : ", error);
     showToastError();
   }
 }
