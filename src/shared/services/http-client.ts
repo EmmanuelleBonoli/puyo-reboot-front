@@ -32,5 +32,13 @@ export async function http<T>(url: string, options: RequestOptions = {}): Promis
     throw new Error(errorBody.message || 'HTTP error');
   }
 
+  const contentLength = response.headers.get('Content-Length');
+  const contentType = response.headers.get('Content-Type');
+
+  // ✅ Ne tente de parser en JSON que si la réponse contient quelque chose
+  if (contentLength === '0' || response.status === 204 || !contentType?.includes('application/json')) {
+    return {} as T;
+  }
+
   return await response.json();
 }

@@ -110,11 +110,11 @@ function updateOxygen(matchingBubblesNumber: number): void {
   align-items: center;
 
   &.left-handed {
-    flex-direction: row-reverse;
+    flex-direction: row;
   }
 
   &.right-handed {
-    flex-direction: row;
+    flex-direction: row-reverse;
   }
 
   .grid-game {

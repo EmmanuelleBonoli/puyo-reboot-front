@@ -65,6 +65,8 @@ export const useGameStore = defineStore('game', () => {
         score: dataGame.statsGame.score ?? 0,
         oxygen: dataGame.statsGame.oxygen ?? 100,
         inventory: dataGame.statsGame.inventory ?? [],
+        bestScore: dataGame.statsGame.bestScore ?? 0,
+        coins: dataGame.statsGame.coins ?? 0,
       },
       restingBubbles: dataGame.restingBubbles ?? [],
       waitingBubbles: dataGame.waitingBubbles ?? null,

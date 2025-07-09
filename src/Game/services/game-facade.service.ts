@@ -17,6 +17,7 @@ import {
   type Bubble,
   type BubblePair,
   FALLING_BUBBLES_DELAY_MS,
+  type Game,
   type GameData,
   type GridGame,
   OPPOSITE_ORIENTATION_MAP,
@@ -40,6 +41,10 @@ export class GameFacadeService {
     } catch (error) {
       throw error;
     }
+  }
+
+  getGame(): Game {
+    return this._gameStore.getGame();
   }
 
   deleteBubbles(bubblesToDelete: Bubble[]): void {

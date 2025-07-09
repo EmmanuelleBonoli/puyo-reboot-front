@@ -1,23 +1,25 @@
 <template>
-  <div
-    class="buttons-game"
-    :style="{
-      justifyContent: user?.isLeftHanded ? 'flex-end' : 'flex-start',
-    }">
-    <AvatarButton @click="emit('update:isOpenMenu', true)" />
+  <div class="buttons-game" :class="authStore.user?.isLeftHanded ? 'left-handed' : 'right-handed'">
+    <h1 class="title nabla-font">{{ t('game.name') }}</h1>
+    <div class="coin-counter">
+      <Avatar image="/images/Game/Store/oneCoin.png" shape="circle" />
+      <p>{{ coins }}</p>
+    </div>
     <Button @click="openStore" class="button-store" variant="outlined" rounded>
       <i class="store-icon fa-solid fa-store"></i>
     </Button>
-    <h1 class="title nabla-font">Astro Puyo</h1>
+    <Avatar :image="baseApiUrl + user?.avatar" size="large" shape="circle" class="avatar" @click="openProfile" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Button } from 'primevue';
-import AvatarButton from '../menus/AvatarButton.vue';
+import { computed } from 'vue';
+import { Button, Avatar } from 'primevue';
+import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../../../Authentication/store/auth.store.ts';
-import type { User } from '../../../Authentication/models/user';
+import type { User } from '../../../Authentication/models/user.types.ts';
+import { baseApiUrl } from '../../../shared/models/sharedVariables.ts';
+import { ScoreFacadeService } from '../../services/score-facade.service.ts';
 
 const props = defineProps({
   isOpenMenu: Boolean,
@@ -30,15 +32,23 @@ const emit = defineEmits<{
 }>();
 
 const authStore = useAuthStore();
-const user = ref<User | null>(authStore.user);
+const { t } = useI18n();
+const scoreFacadeService = new ScoreFacadeService();
+const user = computed<User | null>(() => authStore.user);
+const coins = computed(() => scoreFacadeService.getCoins());
 
 function openStore(event: Event): void {
   event.stopPropagation();
   emit('update:isOpenStore', !props.isOpenStore);
 }
+
+function openProfile(event: Event): void {
+  event.stopPropagation();
+  emit('update:isOpenMenu', !props.isOpenMenu);
+}
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .buttons-game {
   display: flex;
   width: 100%;
@@ -46,6 +56,14 @@ function openStore(event: Event): void {
   align-items: center;
   padding: 2%;
   background-color: var(--primary-color);
+
+  &.left-handed {
+    flex-direction: row;
+  }
+
+  &.right-handed {
+    flex-direction: row-reverse;
+  }
 
   .button-store {
     border-radius: 50%;
@@ -57,6 +75,20 @@ function openStore(event: Event): void {
       padding: 10px;
       font-size: 1.5rem;
       color: var(--background-color);
+    }
+  }
+
+  .coin-counter {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-left: 2%;
+    color: var(--secondary-color);
+    font-size: 1rem;
+
+    p {
+      margin: 0;
+      font-weight: bold;
     }
   }
 

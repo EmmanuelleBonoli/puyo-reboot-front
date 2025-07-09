@@ -1,0 +1,46 @@
+{
+  "common": {
+    "error": "Un problème est survenu, veuillez réessayer"
+  },
+  "login": {
+    "email": "E-mail",
+    "emailMinLength": "L'e-mail doit contenir au moins 3 caractères.",
+    "emailRequired": "L'e-mail est requis.",
+    "password": "Mot de passe",
+    "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères.",
+    "passwordRequired": "Le mot de passe est requis.",
+    "passwordUppercase": "Le mot de passe doit contenir au moins une lettre majuscule.",
+    "passwordCharacter": "Le mot de passe doit contenir au moins un caractère spécial.",
+    "formSubmit": "Envoyer",
+    "formError": "Erreur de connexion, veuillez réessayer."
+  },
+  "game": {
+    "name": "Astro Puyo",
+    "astronaut": "Astronaute",
+    "planet": "Planète",
+    "loadingMessage": {
+      "message1": "Préparation au décollage !",
+      "message2": "Remplissage des réserves d'oxygène",
+      "message3": "Départ imminent !"
+    },
+    "menu": {
+      "resume": "Reprendre la partie",
+      "newGame": "Nouvelle partie",
+      "profile": "Mon Profil",
+      "settings": "Paramètres"
+    }
+  },
+  "settings": {
+    "music": "Musique",
+    "soundEffects": "Effets sonores",
+    "leftHandedMode": "Mode gaucher",
+    "seeRules": "Voir les règles",
+    "language": "Langue",
+    "french": "Français",
+    "english": "Anglais",
+    "bestScore": "Meilleur score :",
+    "myAstronaut": "Mon astronaute",
+    "chooseAvatar": "Choisis ton avatar :",
+    "chooseAstronaut": "Choisis ton astronaute :"
+  }
+}

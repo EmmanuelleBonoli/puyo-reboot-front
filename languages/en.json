@@ -1,0 +1,46 @@
+{
+  "common": {
+    "error": "Something went wrong. Please try again."
+  },
+  "login": {
+    "email": "Email",
+    "emailMinLength": "Email must be at least 3 characters long.",
+    "emailRequired": "Email is required.",
+    "password": "Password",
+    "passwordMinLength": "Password must be at least 8 characters long.",
+    "passwordRequired": "Password is required.",
+    "passwordUppercase": "Password must contain at least one uppercase letter.",
+    "passwordCharacter": "Password must contain at least one special character.",
+    "formSubmit": "Submit",
+    "formError": "Connection error, please try again."
+  },
+  "game": {
+    "name": "Astro Puyo",
+    "astronaut": "Astronaut",
+    "planet": "Planet",
+    "loadingMessage": {
+      "message1": "Preparing for liftoff!",
+      "message2": "Filling up the oxygen tanks",
+      "message3": "Launch is imminent!"
+    },
+    "menu": {
+      "resume": "Resume Game",
+      "newGame": "New Game",
+      "profile": "My Profile",
+      "settings": "Settings"
+    }
+  },
+  "settings": {
+    "music": "Music",
+    "soundEffects": "Sound Effects",
+    "leftHandedMode": "Left-Handed Mode",
+    "seeRules": "View Rules",
+    "language": "Language",
+    "french": "French",
+    "english": "English",
+    "bestScore": "Best score :",
+    "myAstronaut": "My astronaut",
+    "chooseAvatar": "Choose your avatar :",
+    "chooseAstronaut": "Choose your astronaut :"
+  }
+}

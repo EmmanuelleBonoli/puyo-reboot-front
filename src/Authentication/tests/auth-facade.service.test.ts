@@ -8,6 +8,7 @@ jest.mock('../services/auth-api.service', () => ({
 }));
 
 import { loginUser, getUserWithToken } from '../services/auth-api.service';
+import { initialUser, type LangCode } from '../models/user.types.ts';
 
 describe('AuthFacadeService', () => {
   let authFacadeService: AuthFacadeService;
@@ -46,9 +47,13 @@ describe('AuthFacadeService', () => {
     it('should return user if already in store', async () => {
       const userTest = {
         email: 'stored@example.com',
-        playName: 'userTest',
+        playerName: 'userTest',
         avatar: 'image avatar link',
+        astronaut: 'astronaut link',
         isLeftHanded: false,
+        isMusicEnabled: true,
+        isSoundEffectsEnabled: true,
+        language: 'en' as LangCode,
       };
 
       jest.spyOn(authStore, 'getUser').mockReturnValue(userTest);
@@ -61,7 +66,7 @@ describe('AuthFacadeService', () => {
     });
 
     it('should fetch user with token if not in store but token exists', async () => {
-      jest.spyOn(authStore, 'getUser').mockReturnValue(null);
+      jest.spyOn(authStore, 'getUser').mockReturnValue(initialUser);
       jest.spyOn(authStore, 'getToken').mockReturnValue('fake-token');
       jest.spyOn(authStore, 'setAuthData').mockImplementation(jest.fn());
 
@@ -79,7 +84,7 @@ describe('AuthFacadeService', () => {
     });
 
     it('should return null and clear store if token fetch fails', async () => {
-      jest.spyOn(authStore, 'getUser').mockReturnValue(null);
+      jest.spyOn(authStore, 'getUser').mockReturnValue(initialUser);
       jest.spyOn(authStore, 'getToken').mockReturnValue('fake-token');
       jest.spyOn(authStore, 'clearAuthData').mockImplementation(jest.fn());
       (getUserWithToken as jest.Mock).mockRejectedValue(new Error('fail'));
@@ -91,7 +96,7 @@ describe('AuthFacadeService', () => {
     });
 
     it('should return null if no token', async () => {
-      jest.spyOn(authStore, 'getUser').mockReturnValue(null);
+      jest.spyOn(authStore, 'getUser').mockReturnValue(initialUser);
       jest.spyOn(authStore, 'getToken').mockReturnValue(null);
 
       const result = await authFacadeService.getUser();

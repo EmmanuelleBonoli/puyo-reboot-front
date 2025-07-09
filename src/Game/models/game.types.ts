@@ -11,6 +11,7 @@ export const GAIN_OXYGEN: number = 20;
 export const POINTS_PER_BUBBLE: number = 10;
 export const TIME_BETWEEN_MATCHING_BUBBLES_MS: number = 1500;
 export const MAX_OXYGEN: number = 100;
+export const MAX_INVENTORY_SIZE: number = 2;
 
 export const FALLING_BUBBLES_DELAY_MS = 2000;
 export const GRAVITY_ANIMATION_DELAY_MS = 250;
@@ -64,6 +65,8 @@ export const INITIAL_GAME: Game = {
     score: 0,
     oxygen: 100,
     inventory: [],
+    bestScore: 0,
+    coins: 0,
   },
   restingBubbles: [],
   waitingBubbles: null,
@@ -82,6 +85,8 @@ export type StatsGame = {
   score: number;
   oxygen: number;
   inventory: InventoryItemEnum[];
+  bestScore: number;
+  coins: number;
 };
 
 export type GameData = {
