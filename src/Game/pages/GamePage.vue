@@ -1,5 +1,5 @@
 <template>
-  <div class="page game-page" @touchstart="onTouchStart" @touchmove="onTouchMove" @touchend="onTouchEnd">
+  <div class="page game-page" @touchstart.passive="onTouchStart" @touchmove.passive="onTouchMove" @touchend="onTouchEnd">
     <AnimationHeaderGame />
 
     <svg viewBox="0 0 100 10" width="100%" height="60" preserveAspectRatio="none">

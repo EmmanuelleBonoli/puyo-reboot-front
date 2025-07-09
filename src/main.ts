@@ -23,6 +23,7 @@ app.use(PrimeVue, {
 });
 
 const i18n = createI18n({
+  legacy: false,
   locale: 'fr',
   fallbackLocale: 'fr',
   messages: {

@@ -22,3 +22,7 @@ export function getDeviceLang(): LangCode {
   const lang = navigator.language || navigator.languages[0] || 'en';
   return lang.split('-')[0] as LangCode;
 }
+
+export function generateRandomNumber(maxNumber: number): number {
+  return Math.floor(Math.random() * maxNumber);
+}

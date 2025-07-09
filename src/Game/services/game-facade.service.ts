@@ -1,8 +1,9 @@
 import { useRouter } from 'vue-router';
 import { useGameStore } from '../store/game.store.ts';
-import { deleteOldGameAndReturnNewOne, getWaitingBubblesFromServer } from './game-api.service.ts';
+import { deleteOldGameAndReturnNewOne, generateSpecialBubblesApi, getWaitingBubblesFromServer } from './game-api.service.ts';
 import {
   computeGravityMovements,
+  getCellKey,
   getNextOrientation,
   getNextSatellitePosition,
   groupBubblesByColumn,
@@ -16,14 +17,21 @@ import {
 import {
   type Bubble,
   type BubblePair,
+  CHANCE_TO_GENERATE_SPECIAL_BUBBLES,
+  DIRECTIONS_MOVEMENT_GAME,
   FALLING_BUBBLES_DELAY_MS,
   type Game,
   type GameData,
   type GridGame,
+  ITEMS_INVENTORY,
+  MAX_INVENTORY_SIZE,
   OPPOSITE_ORIENTATION_MAP,
 } from '../models/game.types.ts';
 import { BubbleStatusEnum } from '../models/BubbleStatusEnum.ts';
 import { OrientationMoveEnum } from '../models/OrientationMoveEnum.ts';
+import { BubbleTypeEnum } from '../models/BubbleTypeEnum.ts';
+import { generateRandomNumber } from '../../shared/services/utils.ts';
+import type { InventoryItemEnum } from '../models/InventoryItemEnum.ts';
 
 export class GameFacadeService {
   private _gameStore = useGameStore();
@@ -131,6 +139,13 @@ export class GameFacadeService {
         return;
       }
       fallingBubbles = this._gameStore.getFallingBubbles();
+
+      // 1.5 Générer aléatoirement des bulles spéciales (gift, ghost, unbreakable)
+      try {
+        await this.generateSpecialBubblesIfNeeded(game.id);
+      } catch (error) {
+        console.error('Erreur lors de la génération des bulles spéciales :', error);
+      }
 
       // 2. Ne générer de nouvelles bulles que si on a promues les précédentes
       try {
@@ -284,6 +299,56 @@ export class GameFacadeService {
     }
   }
 
+  ghostBubbleAroundMatchingGroup(bubbles: Bubble[]): Bubble[] {
+    const ghostBubbles: Bubble[] = [];
+    const seen = new Set<string>();
+
+    for (const bubble of bubbles) {
+      const { rowIndex, columnIndex } = bubble.position;
+
+      for (const [dRow, dCol] of DIRECTIONS_MOVEMENT_GAME) {
+        const newRow = rowIndex + dRow;
+        const newCol = columnIndex + dCol;
+
+        if (!isInsideGrid({ rowIndex: newRow, columnIndex: newCol })) continue;
+
+        const neighbor = this._gameStore.getGridGame()[newRow][newCol];
+        const key = getCellKey(newRow, newCol);
+        if (!seen.has(key) && isBubble(neighbor) && neighbor.type === BubbleTypeEnum.GHOST && neighbor.status === BubbleStatusEnum.RESTING) {
+          ghostBubbles.push(neighbor);
+          seen.add(key);
+        }
+      }
+    }
+
+    return ghostBubbles;
+  }
+
+  generatePlayerGift(giftToGenerateNumber: number): void {
+    const game = this._gameStore.getGame();
+    const itemsInInventory: number = game.statsGame.inventory.length;
+
+    const availableSlots = MAX_INVENTORY_SIZE - itemsInInventory;
+    const itemToGenerateAvailable = Math.min(giftToGenerateNumber, availableSlots);
+
+    if (itemToGenerateAvailable > 0) {
+      const itemGift: InventoryItemEnum[] = [];
+      for (let i = 0; i < itemToGenerateAvailable; i++) {
+        const maxLengthInventory = ITEMS_INVENTORY.length;
+        const randomItemGenerate = ITEMS_INVENTORY[generateRandomNumber(maxLengthInventory)];
+        itemGift.push(randomItemGenerate.inventory);
+      }
+      const newInventory = [...game.statsGame.inventory, ...itemGift];
+      this._gameStore.setGame({
+        ...game,
+        statsGame: {
+          ...game.statsGame,
+          inventory: newInventory,
+        },
+      });
+    }
+  }
+
   private _isGameOver(): boolean {
     const grid = this._gameStore.getGridGame();
 
@@ -300,5 +365,20 @@ export class GameFacadeService {
 
   setIsGameOver(isOver: boolean): void {
     this._gameStore.setIsGameOver(isOver);
+  }
+
+  async generateSpecialBubblesIfNeeded(gameId: string): Promise<void> {
+    const shouldGenerate = Math.random() < CHANCE_TO_GENERATE_SPECIAL_BUBBLES;
+    if (!shouldGenerate) return;
+
+    const gameData: GameData = {
+      restingBubbles: this._gameStore.getRestingBubbles(),
+      statsGame: this._gameStore.game.statsGame,
+    };
+
+    const newSpecials = await generateSpecialBubblesApi(gameId, gameData);
+
+    this._gameStore.addRestingBubbles(newSpecials);
+    this.applyGravity();
   }
 }

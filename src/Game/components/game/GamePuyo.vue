@@ -7,6 +7,11 @@
         :id="isBubble(cell) ? `${cell.position.rowIndex}-${cell.position.columnIndex}` : `${cell.rowIndex}-${cell.columnIndex}`"
         class="cell">
         <img v-if="isBubble(cell)" :src="getBubbleImage(cell)" alt="bubble" class="bubble-img" />
+        <img
+          v-if="isBubble(cell) && cell.type === BubbleTypeEnum.GIFT"
+          class="bubble-img gift"
+          :src="`/images/Game/Gifts/${cell.color.toLowerCase()}.png`"
+          alt="bubble" />
       </div>
     </div>
 
@@ -29,6 +34,7 @@ import { type Bubble, type BubblePair, type GridGame } from '../../models/game.t
 import { getBubbleImage, getMatchingGroup, isBubble } from '../../utils/bubble.utils.ts';
 import { GameFacadeService } from '../../services/game-facade.service.ts';
 import { ScoreFacadeService } from '../../services/score-facade.service.ts';
+import { BubbleTypeEnum } from '../../models/BubbleTypeEnum.ts';
 
 const props = defineProps({
   isGamePlayOn: Boolean,
@@ -81,6 +87,15 @@ async function resolveMatchesBubbles(): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 600));
     const currentMatches = [...matchBubbles.value];
     if (currentMatches.length === 0) break;
+
+    const giftBubbles = currentMatches.filter(bubble => bubble.type === BubbleTypeEnum.GIFT);
+    if (giftBubbles.length > 0) {
+      gameFacadeService.generatePlayerGift(giftBubbles.length);
+    }
+
+    const ghostBubblesToDelete = gameFacadeService.ghostBubbleAroundMatchingGroup(currentMatches);
+    currentMatches.push(...ghostBubblesToDelete);
+
     gameFacadeService.deleteBubbles(currentMatches);
 
     updateScore(currentMatches.length);
@@ -148,12 +163,17 @@ function updateOxygen(matchingBubblesNumber: number): void {
     object-fit: contain;
   }
 
+  .gift {
+    position: absolute;
+  }
+
   .cell {
     border: 1px solid var(--surface-card);
     display: flex;
     align-items: center;
     justify-content: center;
     transform: scaleY(-1);
+    position: relative;
   }
 
   @keyframes fall {
