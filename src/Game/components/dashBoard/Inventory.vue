@@ -3,7 +3,7 @@
     <div v-for="(item, index) of inventory" :key="index" class="item">
       <img
         @touchstart="selectInventoryItem($event, item)"
-        @touchmove="updateCursorPosition"
+        @touchmove.passive="updateCursorPosition"
         @touchend="onTouchEnd"
         :src="`/images/Game/Items/${item.toLowerCase()}.png`"
         :alt="`item-${item}`"

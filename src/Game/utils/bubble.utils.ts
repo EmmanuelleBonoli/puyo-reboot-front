@@ -1,16 +1,16 @@
 import {
   type Bubble,
   type BubblePair,
-  type GridPosition,
   COLS_GRID_GAME,
+  DIRECTIONS_AROUND_BUBBLE,
+  DIRECTIONS_MOVEMENT_GAME,
+  type GridCell,
   type GridGame,
+  type GridPosition,
   MIN_MATCHING_BUBBLE,
   NEXT_ORIENTATION_MAP,
   ROWS_GRID_GAME,
   SATELLITE_OFFSETS,
-  type GridCell,
-  DIRECTIONS_MOVEMENT_GAME,
-  DIRECTIONS_AROUND_BUBBLE,
 } from '../models/game.types.ts';
 import { BubbleTypeEnum } from '../models/BubbleTypeEnum.ts';
 import { BubbleSatelliteOrientationEnum } from '../models/BubbleSatelliteOrientationEnum.ts';
@@ -59,7 +59,12 @@ export function getMatchingGroup(grid: GridGame): Bubble[] {
       const bubble = grid[row][col];
       const key = getCellKey(row, col);
 
-      if (isBubble(bubble) && bubble.type === BubbleTypeEnum.NORMAL && !visited.has(key) && bubble.status === BubbleStatusEnum.RESTING) {
+      if (
+        isBubble(bubble) &&
+        (bubble.type === BubbleTypeEnum.NORMAL || bubble.type === BubbleTypeEnum.GIFT) &&
+        !visited.has(key) &&
+        bubble.status === BubbleStatusEnum.RESTING
+      ) {
         const localVisited = new Set<string>();
         const group = findMatchingGroup(grid, row, col, visited);
 
@@ -151,7 +156,8 @@ function findMatchingGroup(grid: GridGame, startRow: number, startCol: number, v
   const group: Bubble[] = [];
   const bubbleOnGrid = grid[startRow][startCol];
 
-  if (!isBubble(bubbleOnGrid) || (isBubble(bubbleOnGrid) && bubbleOnGrid.type !== BubbleTypeEnum.NORMAL)) return group;
+  if (!isBubble(bubbleOnGrid) || (isBubble(bubbleOnGrid) && bubbleOnGrid.type !== BubbleTypeEnum.NORMAL && bubbleOnGrid.type !== BubbleTypeEnum.GIFT))
+    return group;
 
   const targetColor = bubbleOnGrid.color;
   const stack: [number, number][] = [[startRow, startCol]];
@@ -167,7 +173,10 @@ function findMatchingGroup(grid: GridGame, startRow: number, startCol: number, v
     const bubble = grid[row][col];
     if (
       !isBubble(bubble) ||
-      (isBubble(bubble) && (bubble.status !== BubbleStatusEnum.RESTING || bubble.type !== BubbleTypeEnum.NORMAL || bubble.color !== targetColor))
+      (isBubble(bubble) &&
+        (bubble.status !== BubbleStatusEnum.RESTING ||
+          (bubble.type !== BubbleTypeEnum.NORMAL && bubble.type !== BubbleTypeEnum.GIFT) ||
+          bubble.color !== targetColor))
     )
       continue;
 

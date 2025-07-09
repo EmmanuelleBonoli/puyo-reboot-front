@@ -15,27 +15,12 @@ import { Button, Avatar } from 'primevue';
 import { ScoreFacadeService } from '../../services/score-facade.service.ts';
 import { useCommonToasts } from '../../../shared/services/utils.ts';
 import type { InventoryItem } from '../../models/store.types.ts';
-import { InventoryItemEnum } from '../../models/InventoryItemEnum.ts';
+import { ITEMS_INVENTORY } from '../../models/game.types.ts';
 
 const scoreFacadeService = new ScoreFacadeService();
 const { showToastError } = useCommonToasts();
 
-const inventoryStoreDetails = [
-  {
-    title: '1 bombe',
-    inventory: InventoryItemEnum.BOMB,
-    iconImage: '/images/Game/Items/bomb.png',
-    price: 5,
-    value: 1,
-  },
-  {
-    title: '1 oxygène',
-    inventory: InventoryItemEnum.OXYGEN,
-    iconImage: '/images/Game/Items/oxygen.png',
-    price: 10,
-    value: 1,
-  },
-];
+const inventoryStoreDetails = ITEMS_INVENTORY;
 
 async function buyItem(item: InventoryItem): Promise<void> {
   try {
