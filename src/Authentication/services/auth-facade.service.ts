@@ -1,5 +1,5 @@
 import { useAuthStore } from '../store/auth.store';
-import type { User } from '../models/user';
+import type { User } from '../models/user.types.ts';
 import { loginUser, getUserWithToken } from './auth-api.service';
 import { useGameStore } from '../../Game/store/game.store.ts';
 
@@ -45,5 +45,17 @@ export class AuthFacadeService {
 
   logout(): void {
     this._authStore.clearAuthData();
+  }
+
+  getFromLocalStorage(item: string): string | null {
+    return localStorage.getItem(item);
+  }
+
+  saveToLocalStorage(item: string, value: string): void {
+    localStorage.setItem(item, value);
+  }
+
+  removeToLocalStorage(item: string): void {
+    localStorage.removeItem(item);
   }
 }

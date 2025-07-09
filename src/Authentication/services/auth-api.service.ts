@@ -1,4 +1,4 @@
-import type { AuthLoginRequest, AuthLoginResponse } from '../models/user';
+import type { AuthLoginRequest, AuthLoginResponse } from '../models/user.types.ts';
 import { http } from '../../shared/services/http-client';
 
 export function loginUser(payload: AuthLoginRequest): Promise<AuthLoginResponse> {
@@ -10,6 +10,6 @@ export function loginUser(payload: AuthLoginRequest): Promise<AuthLoginResponse>
 
 export function getUserWithToken(): Promise<AuthLoginResponse> {
   return http<AuthLoginResponse>('/auth/with-token', {
-    auth: true, // add the token
+    auth: true,
   });
 }

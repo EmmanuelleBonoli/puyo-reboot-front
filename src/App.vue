@@ -1,11 +1,22 @@
-<script setup lang="ts"></script>
-
 <template>
   <div class="screen-game">
     <Toast />
     <RouterView />
   </div>
 </template>
+
+<script setup lang="ts">
+import { AuthFacadeService } from './Authentication/services/auth-facade.service.ts';
+import { getDeviceLang } from './shared/services/utils.ts';
+import type { LangCode } from './Authentication/models/user.types.ts';
+import { UserFacadeService } from './Game/services/user-facade.service.ts';
+
+const authStore = new AuthFacadeService();
+const userFacadeService = new UserFacadeService();
+
+const lang: LangCode = (authStore.getFromLocalStorage('language') || getDeviceLang() || 'en') as LangCode;
+userFacadeService.setGameLanguage(lang);
+</script>
 
 <style scoped>
 .screen-game {

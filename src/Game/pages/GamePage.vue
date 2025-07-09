@@ -27,14 +27,14 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import GameMenu from '../components/menus/GameMenu.vue';
-import GamePuyo from '../components/game/GamePuyo.vue';
 import AnimationHeaderGame from '../components/game/AnimationHeaderGame.vue';
 import FooterGame from '../components/game/FooterGame.vue';
-import StoreGame from '../components/menus/StoreGame.vue';
+import StoreGame from '../components/store/StoreGame.vue';
+import GameMenu from '../components/menus/GameMenu.vue';
+import GamePuyo from '../components/game/GamePuyo.vue';
 import { AuthFacadeService } from '../../Authentication/services/auth-facade.service.ts';
 import { GameFacadeService } from '../services/game-facade.service.ts';
-import type { User } from '../../Authentication/models/user';
+import type { User } from '../../Authentication/models/user.types.ts';
 import { OrientationMoveEnum } from '../models/OrientationMoveEnum.ts';
 import GameOver from '../components/menus/GameOver.vue';
 import { useGameStore } from '../store/game.store.ts';
@@ -51,14 +51,14 @@ const startX = ref(0);
 const startY = ref(0);
 const hasMoved = ref(false);
 
-const isGamePlayOn = computed<boolean>(() => {
-  return !isOpenMenu.value && !isOpenStore.value;
-  //return false ; // Pour les tests, on peut désactiver le jeu en activant cette ligne
-});
-
 const isGameOver = computed<boolean>({
   get: () => gameStore.getIsGameOver(),
   set: (value: boolean) => gameStore.setIsGameOver(value),
+});
+
+const isGamePlayOn = computed<boolean>(() => {
+  return !isOpenMenu.value && !isOpenStore.value && !isGameOver.value;
+  //return false ; // Pour les tests, on peut désactiver le jeu en activant cette ligne
 });
 
 onMounted(async () => {
@@ -111,9 +111,8 @@ function onTouchMove(e: TouchEvent): void {
 
 function onTouchEnd(e: TouchEvent): void {
   const target = e.target as HTMLElement;
-
-  // Si l'utilisateur clique sur les menus, on ne fait rien
-  if (target.closest('.p-dialog, .menu-options, button')) {
+  // Si l'utilisateur clique sur les menus ou touche un item de l'inventaire, on ne fait rien
+  if (target.className === 'inventory-item' || target.closest('.p-avatar, .p-dialog, .menu-options, button')) {
     return;
   }
 

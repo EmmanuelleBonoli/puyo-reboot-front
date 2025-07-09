@@ -1,12 +1,22 @@
 import { useGameStore } from '../store/game.store.ts';
 import { InventoryItemEnum } from '../models/InventoryItemEnum.ts';
-import { GAIN_OXYGEN, type GridPosition, MAX_OXYGEN, POINTS_PER_BUBBLE } from '../models/game.types.ts';
+import { GAIN_OXYGEN, type GridPosition, MAX_INVENTORY_SIZE, MAX_OXYGEN, POINTS_PER_BUBBLE } from '../models/game.types.ts';
 import { findBubblesAroundPosition } from '../utils/bubble.utils.ts';
 import { GameFacadeService } from './game-facade.service.ts';
+import { saveBestScoreApi, updateCoinsApi } from './score-api.service.ts';
+import type { InventoryItem, ItemStore } from '../models/store.types.ts';
 
 export class ScoreFacadeService {
   private _gameStore = useGameStore();
   gameFacadeService = new GameFacadeService();
+
+  getCoins(): number {
+    return this._gameStore.getGame().statsGame.coins;
+  }
+
+  getBestScore(): number {
+    return this._gameStore.getGame().statsGame.bestScore;
+  }
 
   getScore(): number {
     return this._gameStore.getGame().statsGame.score;
@@ -84,6 +94,59 @@ export class ScoreFacadeService {
       this._gameStore.getGame().statsGame.oxygen = MAX_OXYGEN;
     } else {
       this._gameStore.getGame().statsGame.oxygen = actualOxygen + newOxygenValue;
+    }
+  }
+
+  async saveBestScore(): Promise<void> {
+    const game = this._gameStore.getGame();
+    const currentScore = this.getScore();
+    const bestScore = this.getBestScore();
+
+    if (currentScore > bestScore) {
+      this._gameStore.setGame({
+        ...game,
+        statsGame: {
+          ...game?.statsGame,
+          bestScore: currentScore,
+        },
+      });
+      await saveBestScoreApi(currentScore);
+    }
+  }
+
+  async buyCoin(coin: ItemStore): Promise<void> {
+    const game = this._gameStore.getGame();
+    const currentCoins = game.statsGame.coins;
+
+    // todo: add payment logic here : external api ???
+
+    await updateCoinsApi(coin.value);
+
+    this._gameStore.setGame({
+      ...game,
+      statsGame: {
+        ...game.statsGame,
+        coins: currentCoins + coin.value,
+      },
+    });
+  }
+
+  async buyItemInventory(item: InventoryItem): Promise<void> {
+    const game = this._gameStore.getGame();
+    const currentCoins = game.statsGame.coins;
+
+    if (currentCoins >= item.price && game.statsGame.inventory.length < MAX_INVENTORY_SIZE) {
+      const newInventory = [...game.statsGame.inventory, item.inventory];
+      await updateCoinsApi(parseInt(`-${item.price}`));
+
+      this._gameStore.setGame({
+        ...game,
+        statsGame: {
+          ...game.statsGame,
+          coins: currentCoins - item.price,
+          inventory: newInventory,
+        },
+      });
     }
   }
 }

@@ -1,9 +1,9 @@
 <template>
   <div class="loading-page page">
-    <h1 class="nabla-font">Astro Puyo</h1>
+    <h1 class="nabla-font">{{ t('game.name') }}</h1>
 
-    <img class="astro" src="/images/Home/astro.png" alt="astronaute" />
-    <img class="planet" src="/images/Home/planet.png" alt="planète" />
+    <img class="astro" src="/images/Home/astro.png" :alt="t('game.astronaut')" />
+    <img class="planet" src="/images/Home/planet.png" :alt="t('game.planet')" />
     <div class="loading-progress">
       <ProgressBar class="progress-bar" :value="progressValue" />
       <p class="caveat-font">{{ loadingMessage }}</p>
@@ -14,10 +14,12 @@
 <script setup lang="ts">
 import { ProgressBar } from 'primevue';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { AuthFacadeService } from '../../Authentication/services/auth-facade.service.ts';
 import { useRouter } from 'vue-router';
 
-const messages: string[] = ['Préparation au décollage !', "Remplissage des réserves d'oxygène", 'Départ imminent !'];
+const { t } = useI18n();
+const messages: string[] = [t('game.loadingMessage.message1'), t('game.loadingMessage.message2'), t('game.loadingMessage.message3')];
 
 const router = useRouter();
 const authFacade = new AuthFacadeService();
