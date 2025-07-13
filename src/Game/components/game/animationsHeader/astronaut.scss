@@ -1,0 +1,45 @@
+.astronaut {
+  object-fit: contain;
+  height: 60%;
+}
+
+.fly-wave {
+  animation: fly-wave 6s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes fly-wave {
+  0% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+  10% {
+    transform: translateX(10px) translateY(-6px) rotate(-6deg);
+  }
+  20% {
+    transform: translateX(20px) translateY(0px) rotate(5deg);
+  }
+  30% {
+    transform: translateX(30px) translateY(6px) rotate(-5deg);
+  }
+  40% {
+    transform: translateX(40px) translateY(0px) rotate(4deg);
+  }
+  50% {
+    transform: translateX(50px) translateY(-4px) rotate(-4deg);
+  }
+  60% {
+    transform: translateX(60px) translateY(0px) rotate(3deg);
+  }
+  70% {
+    transform: translateX(50px) translateY(4px) rotate(-3deg);
+  }
+  80% {
+    transform: translateX(40px) translateY(0px) rotate(2deg);
+  }
+  90% {
+    transform: translateX(20px) translateY(-2px) rotate(-2deg);
+  }
+  100% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+}

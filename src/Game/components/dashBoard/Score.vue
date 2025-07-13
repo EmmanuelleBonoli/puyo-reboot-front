@@ -23,6 +23,12 @@ watch(targetScore, newVal => {
     previousScore.value = newVal;
     return;
   }
+  if (newVal < previousScore.value) {
+    // le joueur a lancé une nouvelle partie, on remet les compteurs à 0
+    displayScore.value = newVal;
+    previousScore.value = newVal;
+    return;
+  }
 
   intervalId = setInterval(() => {
     if (displayScore.value >= newVal) {

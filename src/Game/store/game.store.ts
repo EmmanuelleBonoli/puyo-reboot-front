@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { type Bubble, type BubblePair, COLS_GRID_GAME, type Game, type GridGame, INITIAL_GAME, ROWS_GRID_GAME } from '../models/game.types.ts';
 import { BubbleStatusEnum } from '../models/BubbleStatusEnum.ts';
 import { isBubble } from '../utils/bubble.utils.ts';
@@ -75,7 +75,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function getWaitingBubbles(): BubblePair | null {
-    return game.value.waitingBubbles ?? null;
+    return game.value.waitingBubbles;
   }
 
   function setWaitingBubbles(dataWaitingBubbles: BubblePair | null): void {
@@ -83,7 +83,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function getFallingBubbles(): BubblePair | null {
-    return game.value.fallingBubbles ?? null;
+    return game.value.fallingBubbles;
   }
 
   function setFallingBubbles(dataFallingBubbles: BubblePair | null): void {
@@ -95,16 +95,13 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function addRestingBubbles(bubbles: Bubble[]): void {
-    game.value.restingBubbles.push(...bubbles);
+    const reactiveBubbles = bubbles.map(b => reactive(b));
+    game.value.restingBubbles = [...game.value.restingBubbles, ...reactiveBubbles];
   }
 
   function updatePositionBubbles(updatedBubbles: Bubble[]): void {
-    for (const updatedBubble of updatedBubbles) {
-      const index = game.value.restingBubbles.findIndex(b => b.id === updatedBubble.id);
-      if (index !== -1) {
-        game.value.restingBubbles[index] = updatedBubble;
-      }
-    }
+    const bubbleMap = new Map(updatedBubbles.map(b => [b.id, b]));
+    game.value.restingBubbles = game.value.restingBubbles.map(b => (bubbleMap.has(b.id) ? bubbleMap.get(b.id)! : b));
   }
 
   function deleteBubbles(bubblesId: string[]): void {
@@ -112,7 +109,6 @@ export const useGameStore = defineStore('game', () => {
   }
 
   return {
-    game,
     getIsGameOver,
     setIsGameOver,
     getGameIsOn,

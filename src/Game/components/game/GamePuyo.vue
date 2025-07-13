@@ -45,14 +45,13 @@ const gameStore = useGameStore();
 const gameFacadeService = new GameFacadeService();
 const scoreFacadeService = new ScoreFacadeService();
 
-const restingBubbles = computed<Bubble[]>(() => gameStore.getRestingBubbles());
 const waitingBubbles = computed<BubblePair | null>(() => gameStore.getWaitingBubbles());
-const fallingBubbles = computed<BubblePair | null>(() => gameStore.getFallingBubbles());
 
 const gridGame = computed<GridGame>(() => {
-  const bubblesOnGrid = fallingBubbles.value
-    ? [...restingBubbles.value, fallingBubbles.value.satellite, fallingBubbles.value.pivot]
-    : [...restingBubbles.value];
+  const resting = gameStore.getRestingBubbles();
+  const falling = gameStore.getFallingBubbles();
+
+  const bubblesOnGrid = falling ? [...resting, falling.satellite, falling.pivot] : [...resting];
   return gameFacadeService.updateGridGame(bubblesOnGrid);
 });
 
@@ -82,9 +81,8 @@ watchEffect(async () => {
 
 async function resolveMatchesBubbles(): Promise<void> {
   while (true) {
-    gameFacadeService.applyGravity();
+    await gameFacadeService.applyGravity();
 
-    await new Promise(resolve => setTimeout(resolve, 600));
     const currentMatches = [...matchBubbles.value];
     if (currentMatches.length === 0) break;
 
@@ -100,8 +98,6 @@ async function resolveMatchesBubbles(): Promise<void> {
 
     updateScore(currentMatches.length);
     updateOxygen(currentMatches.length);
-
-    await new Promise(resolve => setTimeout(resolve, 400));
   }
 }
 
@@ -119,7 +115,7 @@ function updateOxygen(matchingBubblesNumber: number): void {
 <style scoped>
 .game-container {
   width: 100%;
-  height: 75%;
+  height: 70%;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -134,9 +130,11 @@ function updateOxygen(matchingBubblesNumber: number): void {
 
   .grid-game {
     display: grid;
-    grid-template-rows: repeat(10, 50px);
-    grid-template-columns: repeat(6, 50px);
+    grid-template-rows: repeat(15, 40px);
+    grid-template-columns: repeat(6, 40px);
     transform: scaleY(-1);
+    overflow: hidden;
+    height: 400px;
   }
 
   .info-game {
@@ -161,6 +159,13 @@ function updateOxygen(matchingBubblesNumber: number): void {
     width: 100%;
     height: 100%;
     object-fit: contain;
+    transform: rotate(180deg);
+    transition: transform 0.3s ease-out;
+    will-change: transform;
+  }
+
+  .bubble-falling {
+    transition: transform 0.3s ease-out;
   }
 
   .gift {
@@ -172,23 +177,7 @@ function updateOxygen(matchingBubblesNumber: number): void {
     display: flex;
     align-items: center;
     justify-content: center;
-    transform: scaleY(-1);
     position: relative;
-  }
-
-  @keyframes fall {
-    from {
-      transform: translateY(0);
-      opacity: 0.5;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
-  .falling-animation {
-    animation: fall 0.25s ease-out;
   }
 }
 </style>

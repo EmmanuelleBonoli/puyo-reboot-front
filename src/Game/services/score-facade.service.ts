@@ -5,6 +5,7 @@ import { findBubblesAroundPosition } from '../utils/bubble.utils.ts';
 import { GameFacadeService } from './game-facade.service.ts';
 import { saveBestScoreApi, updateCoinsApi } from './score-api.service.ts';
 import type { InventoryItem, ItemStore } from '../models/store.types.ts';
+import { BubbleTypeEnum } from '../models/BubbleTypeEnum.ts';
 
 export class ScoreFacadeService {
   private _gameStore = useGameStore();
@@ -30,11 +31,11 @@ export class ScoreFacadeService {
     return this._gameStore.getGame().statsGame.inventory;
   }
 
-  useInventoryItem(itemSelected: InventoryItemEnum, usePosition?: GridPosition): void {
+  async useInventoryItem(itemSelected: InventoryItemEnum, usePosition?: GridPosition): Promise<void> {
     switch (itemSelected) {
       case InventoryItemEnum.BOMB:
         if (usePosition) {
-          this._useBomb(usePosition);
+          await this._useBomb(usePosition);
           this._removeItemFromInventory(InventoryItemEnum.BOMB);
         }
         break;
@@ -48,11 +49,16 @@ export class ScoreFacadeService {
     }
   }
 
-  private _useBomb(usePosition: GridPosition): void {
+  private async _useBomb(usePosition: GridPosition): Promise<void> {
     const bubblesToDelete = findBubblesAroundPosition(usePosition, this._gameStore.getGridGameWithoutFallingBubbles());
 
+    const giftBubbles = bubblesToDelete.filter(bubble => bubble.type === BubbleTypeEnum.GIFT);
+    if (giftBubbles.length > 0) {
+      this.gameFacadeService.generatePlayerGift(giftBubbles.length);
+    }
+
     this.gameFacadeService.deleteBubbles(bubblesToDelete);
-    this.gameFacadeService.applyGravity();
+    await this.gameFacadeService.applyGravity();
   }
 
   private _removeItemFromInventory(item: InventoryItemEnum): void {

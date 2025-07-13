@@ -14,8 +14,8 @@ export type User = {
 export const initialUser: User = {
   email: '',
   playerName: 'initial',
-  avatar: 'avatar1',
-  astronaut: 'astronaut1',
+  avatar: '/images/User/avatar-2.png',
+  astronaut: '/images/Astronaut/astro.png',
   isLeftHanded: false,
   isMusicEnabled: true,
   isSoundEffectsEnabled: true,

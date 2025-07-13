@@ -1,5 +1,5 @@
 <template>
-  <div class="buttons-game" :class="authStore.user?.isLeftHanded ? 'left-handed' : 'right-handed'">
+  <div class="buttons-game" :class="authStore.user.isLeftHanded ? 'left-handed' : 'right-handed'">
     <h1 class="title nabla-font">{{ t('game.name') }}</h1>
     <div class="coin-counter">
       <Avatar image="/images/Game/Store/oneCoin.png" shape="circle" />
@@ -8,7 +8,7 @@
     <Button @click="openStore" class="button-store" variant="outlined" rounded>
       <i class="store-icon fa-solid fa-store"></i>
     </Button>
-    <Avatar :image="baseApiUrl + user?.avatar" size="large" shape="circle" class="avatar" @click="openProfile" />
+    <Avatar :image="baseApiUrl + user.avatar" size="large" shape="circle" class="avatar" @click="openProfile" />
   </div>
 </template>
 
@@ -34,7 +34,7 @@ const emit = defineEmits<{
 const authStore = useAuthStore();
 const { t } = useI18n();
 const scoreFacadeService = new ScoreFacadeService();
-const user = computed<User | null>(() => authStore.user);
+const user = computed<User>(() => authStore.user);
 const coins = computed(() => scoreFacadeService.getCoins());
 
 function openStore(event: Event): void {

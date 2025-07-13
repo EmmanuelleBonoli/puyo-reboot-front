@@ -26,3 +26,7 @@ export function getDeviceLang(): LangCode {
 export function generateRandomNumber(maxNumber: number): number {
   return Math.floor(Math.random() * maxNumber);
 }
+
+export function generateRandomNumberBetweenRang(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}

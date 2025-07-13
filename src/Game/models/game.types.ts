@@ -4,7 +4,8 @@ import type { BubbleStatusEnum } from './BubbleStatusEnum.ts';
 import { BubbleSatelliteOrientationEnum } from './BubbleSatelliteOrientationEnum.ts';
 import { InventoryItemEnum } from './InventoryItemEnum.ts';
 
-export const ROWS_GRID_GAME: number = 10;
+export const ROWS_GRID_GAME = 15;
+export const ROWS_VISIBLE_GRID_GAME: number = 10;
 export const COLS_GRID_GAME: number = 6;
 export const MIN_MATCHING_BUBBLE: number = 4;
 export const GAIN_OXYGEN: number = 20;
@@ -12,6 +13,8 @@ export const POINTS_PER_BUBBLE: number = 10;
 export const MAX_OXYGEN: number = 100;
 export const MAX_INVENTORY_SIZE: number = 2;
 export const CHANCE_TO_GENERATE_SPECIAL_BUBBLES: number = 0.2; // = 20 %
+export const CELL_SIZE = 40;
+export const FALL_SPEED_PX_PER_MS = 0.2; // plus c'est petit grand plus c'est rapide
 
 export const ITEMS_INVENTORY: ItemInventory[] = [
   {
@@ -31,7 +34,6 @@ export const ITEMS_INVENTORY: ItemInventory[] = [
 ];
 
 export const FALLING_BUBBLES_DELAY_MS = 2000;
-export const GRAVITY_ANIMATION_DELAY_MS = 250;
 
 export type GridGame = GridCell[][];
 export type GridCell = Bubble | GridPosition;

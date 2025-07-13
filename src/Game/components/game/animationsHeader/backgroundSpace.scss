@@ -1,0 +1,12 @@
+.background-space {
+  animation: space-anim infinite 4s linear;
+}
+
+@keyframes space-anim {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
