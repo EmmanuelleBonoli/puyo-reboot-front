@@ -3,7 +3,7 @@
     <div v-for="(item, index) of inventory" :key="index" class="item">
       <img
         @touchstart="selectInventoryItem($event, item)"
-        @touchmove.passive="updateCursorPosition"
+        @touchmove="updateCursorPosition"
         @touchend="onTouchEnd"
         :src="`/images/Game/Items/${item.toLowerCase()}.png`"
         :alt="`item-${item}`"
@@ -29,7 +29,7 @@ const selectedItem = ref<InventoryItemEnum | null>(null);
 const cursorX = ref(0);
 const cursorY = ref(0);
 
-function selectInventoryItem(event: Event, itemSelected: InventoryItemEnum): void {
+async function selectInventoryItem(event: Event, itemSelected: InventoryItemEnum): Promise<void> {
   event.preventDefault();
   event.stopPropagation();
 
@@ -40,7 +40,7 @@ function selectInventoryItem(event: Event, itemSelected: InventoryItemEnum): voi
   if (itemSelected === InventoryItemEnum.BOMB) {
     selectedItem.value = itemSelected;
   } else {
-    scoreService.useInventoryItem(itemSelected);
+    await scoreService.useInventoryItem(itemSelected);
   }
 }
 

@@ -26,6 +26,8 @@ import {
   ITEMS_INVENTORY,
   MAX_INVENTORY_SIZE,
   OPPOSITE_ORIENTATION_MAP,
+  CELL_SIZE,
+  FALL_SPEED_PX_PER_MS,
 } from '../models/game.types.ts';
 import { BubbleStatusEnum } from '../models/BubbleStatusEnum.ts';
 import { OrientationMoveEnum } from '../models/OrientationMoveEnum.ts';
@@ -60,13 +62,28 @@ export class GameFacadeService {
     this._gameStore.deleteBubbles(bubblesId);
   }
 
-  applyGravity(): void {
-    const restingBubbles = this._gameStore.getRestingBubbles();
-    const bubblesByCol = groupBubblesByColumn(restingBubbles);
+  async applyGravity(): Promise<void> {
+    const originalPositions: Bubble[] = JSON.parse(JSON.stringify(this._gameStore.getRestingBubbles()));
+
+    const bubblesByCol = groupBubblesByColumn(originalPositions);
     const bubblesToMove = computeGravityMovements(bubblesByCol);
 
     if (bubblesToMove.length === 0) return;
 
+    await this.animateGravity(bubblesToMove);
+
+    const longestFall = Math.max(
+      ...bubblesToMove.map(b => {
+        const original = originalPositions.find((o: Bubble) => o.id === b.id);
+        const distance = original ? Math.abs(b.position.rowIndex - original.position.rowIndex) : 0;
+        return distance * CELL_SIZE;
+      })
+    );
+
+    const duration = longestFall / FALL_SPEED_PX_PER_MS;
+
+    await new Promise(resolve => setTimeout(resolve, duration));
+    this.resetBubbleTransforms(bubblesToMove);
     this._gameStore.updatePositionBubbles(bubblesToMove);
   }
 
@@ -121,6 +138,8 @@ export class GameFacadeService {
     let fallingBubbles = game.fallingBubbles;
     let waitingBubbles = game.waitingBubbles;
 
+    await this.applyGravity();
+
     // 0. Si nouvelle partie,
     if (!fallingBubbles && !waitingBubbles) {
       try {
@@ -139,13 +158,6 @@ export class GameFacadeService {
         return;
       }
       fallingBubbles = this._gameStore.getFallingBubbles();
-
-      // 1.5 Générer aléatoirement des bulles spéciales (gift, ghost, unbreakable)
-      try {
-        await this.generateSpecialBubblesIfNeeded(game.id);
-      } catch (error) {
-        console.error('Erreur lors de la génération des bulles spéciales :', error);
-      }
 
       // 2. Ne générer de nouvelles bulles que si on a promues les précédentes
       try {
@@ -175,8 +187,21 @@ export class GameFacadeService {
 
     // 5. Mise au repos et on recommence
     this.promoteFallingBubbles();
-    this.applyGravity();
-    await this.gameOn();
+    await this.applyGravity();
+
+    // 6 Générer aléatoirement des bulles spéciales (gift, ghost, unbreakable)
+    try {
+      await this.generateSpecialBubblesIfNeeded(game.id);
+    } catch (error) {
+      console.error('Erreur lors de la génération des bulles spéciales :', error);
+    }
+
+    // Time out nécessaire sinon l'animation des special bubbles se déclenche pas.
+    // nextTick ne résout pas le problème.
+    setTimeout(async () => {
+      await this.applyGravity();
+      await this.gameOn();
+    }, 20);
   }
 
   promoteWaitingBubbles(): void {
@@ -216,7 +241,7 @@ export class GameFacadeService {
     try {
       const gameData: GameData = {
         restingBubbles: this._gameStore.getRestingBubbles(),
-        statsGame: this._gameStore.game.statsGame,
+        statsGame: this._gameStore.getGame().statsGame,
       };
 
       const newWaiting = await getWaitingBubblesFromServer(gameId, gameData);
@@ -373,12 +398,59 @@ export class GameFacadeService {
 
     const gameData: GameData = {
       restingBubbles: this._gameStore.getRestingBubbles(),
-      statsGame: this._gameStore.game.statsGame,
+      statsGame: this._gameStore.getGame().statsGame,
     };
 
-    const newSpecials = await generateSpecialBubblesApi(gameId, gameData);
+    this._gameStore.addRestingBubbles(await generateSpecialBubblesApi(gameId, gameData));
+  }
 
-    this._gameStore.addRestingBubbles(newSpecials);
-    this.applyGravity();
+  async animateGravity(updated: Bubble[]): Promise<void> {
+    for (const bubble of updated) {
+      const originalBubble = this._gameStore.getRestingBubbles().find(b => b.id === bubble.id);
+      if (!originalBubble) continue;
+      const distance = bubble.position.rowIndex - originalBubble.position.rowIndex;
+      if (distance > 0) continue;
+      const el = document
+        .getElementById(`${originalBubble.position.rowIndex}-${originalBubble.position.columnIndex}`)
+        ?.querySelector('img.bubble-img') as HTMLImageElement;
+      let el2;
+      if (originalBubble.type === BubbleTypeEnum.GIFT) {
+        el2 = document
+          .getElementById(`${originalBubble.position.rowIndex}-${originalBubble.position.columnIndex}`)
+          ?.querySelector('img.gift') as HTMLImageElement;
+      }
+      if (!el) continue;
+
+      const pixelDistance: number = Math.abs(distance * CELL_SIZE);
+      const duration = pixelDistance / FALL_SPEED_PX_PER_MS;
+
+      el.classList.add('bubble-falling');
+      el.style.transition = `transform ${duration}ms ease-out`;
+      el.style.transform = `translateY(${-pixelDistance}px)`;
+      if (el2) {
+        el2.classList.add('bubble-falling');
+        el2.style.transition = `transform ${duration}ms ease-out`;
+        el2.style.transform = `translateY(${-pixelDistance}px)`;
+      }
+    }
+  }
+
+  resetBubbleTransforms(bubbles: Bubble[]): void {
+    for (const bubble of bubbles) {
+      const el = document
+        .getElementById(`${bubble.position.rowIndex}-${bubble.position.columnIndex}`)
+        ?.querySelector('img.bubble-img') as HTMLImageElement;
+      if (!el) continue;
+      el.style.transition = '';
+      el.style.transform = '';
+      el.classList.remove('bubble-falling');
+      const el2 = document
+        .getElementById(`${bubble.position.rowIndex}-${bubble.position.columnIndex}`)
+        ?.querySelector('img.gift') as HTMLImageElement;
+      if (!el2) continue;
+      el2.style.transition = '';
+      el2.style.transform = '';
+      el2.classList.remove('bubble-falling');
+    }
   }
 }

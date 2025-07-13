@@ -9,8 +9,8 @@ import {
   type GridPosition,
   MIN_MATCHING_BUBBLE,
   NEXT_ORIENTATION_MAP,
-  ROWS_GRID_GAME,
   SATELLITE_OFFSETS,
+  ROWS_GRID_GAME,
 } from '../models/game.types.ts';
 import { BubbleTypeEnum } from '../models/BubbleTypeEnum.ts';
 import { BubbleSatelliteOrientationEnum } from '../models/BubbleSatelliteOrientationEnum.ts';
@@ -123,33 +123,23 @@ export function computeGravityMovements(bubblesByCol: Record<number, Bubble[]>):
   for (const col in bubblesByCol) {
     const columnBubbles = bubblesByCol[col].sort((a, b) => a.position.rowIndex - b.position.rowIndex);
 
-    let nextFreeRow = 0;
+    let targetRow = 0;
+
     for (const bubble of columnBubbles) {
-      if (bubble.position.rowIndex !== nextFreeRow) {
+      if (bubble.position.rowIndex !== targetRow) {
         bubblesToMove.push({
           ...bubble,
           position: {
             ...bubble.position,
-            rowIndex: nextFreeRow,
+            rowIndex: targetRow,
           },
         });
       }
-      nextFreeRow++;
+      targetRow++;
     }
   }
+
   return bubblesToMove;
-}
-
-export function computeGravityDistances(updated: Bubble[], original: Bubble[]): Record<string, number> {
-  const distanceMap: Record<string, number> = {};
-
-  for (const bubble of updated) {
-    const originalBubble = original.find(b => b.id === bubble.id);
-    if (originalBubble) {
-      distanceMap[bubble.id] = bubble.position.rowIndex - originalBubble.position.rowIndex;
-    }
-  }
-  return distanceMap;
 }
 
 function findMatchingGroup(grid: GridGame, startRow: number, startCol: number, visited: Set<string>): Bubble[] {
@@ -207,10 +197,7 @@ export function isFreeOfMovement(fallingBubbles: BubblePair, gridGame: GridGame,
   }));
 
   for (const pos of nextPositions) {
-    // Bloque si en dehors de la grille
     if (!isInsideGrid(pos)) return false;
-
-    // Bloque si une case est déjà occupée dans la grille
     if (!isEmptyPosition(pos, gridGame)) return false;
   }
   return true;

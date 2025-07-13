@@ -1,0 +1,19 @@
+.meteor {
+  object-fit: contain;
+  height: 60%;
+  z-index: 2;
+}
+
+.fly-meteor {
+  animation: fly-meteor 2s linear;
+  transform-origin: center;
+}
+
+@keyframes fly-meteor {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
