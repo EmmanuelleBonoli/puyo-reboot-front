@@ -9,5 +9,6 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": false
   },
-  "include": ["src/**/*.spec.ts", "src/**/*.test.ts", "tests/**/*.ts"]
+  "include": ["src/**/*.spec.ts", "src/**/*.test.ts", "tests/**/*.ts"],
+  "exclude": []
 }
