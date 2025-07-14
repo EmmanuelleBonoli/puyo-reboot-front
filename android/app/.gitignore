@@ -1,0 +1,33 @@
+# Android build
+/build/
+**/build/
+!.gitkeep
+!.npmkeep
+
+# Gradle
+.gradle/
+local.properties
+*.iml
+.idea/
+*.log
+
+# Signing
+*.jks
+*.keystore
+*.key
+*.pem
+
+# Android Studio
+/captures/
+/output.json
+app/release/
+app/debug/
+
+# MacOS
+.DS_Store
+
+# Node / Capacitor
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

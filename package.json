@@ -5,13 +5,16 @@
   "type": "module",
   "scripts": {
     "prepare": "husky",
-    "dev": "vite --mode development",
+    "dev": "vite --mode development --host",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "test": "jest --config jest.config.ts --verbose",
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.2",
+    "@capacitor/cli": "^7.4.2",
+    "@capacitor/core": "^7.4.2",
     "@primeuix/themes": "^1.1.1",
     "@primevue/forms": "^4.3.4",
     "pinia": "^3.0.2",
