@@ -2,12 +2,10 @@
   <div class="game-dash">
     <Oxygen />
     <Inventory />
-    <Score />
   </div>
 </template>
 <script setup lang="ts">
 import Oxygen from './Oxygen.vue';
-import Score from './Score.vue';
 import Inventory from './Inventory.vue';
 </script>
 

@@ -2,7 +2,7 @@
   <div class="animation-header">
     <div class="background background-space"></div>
     <div class="astro-container">
-      <img class="astronaut fly-wave" :src="baseApiUrl + user.astronaut" alt="astronaut" />
+      <img class="astronaut fly-wave" :src="user.astronaut" alt="astronaut" />
       <img v-if="spaceObstacleDisplay" :class="spaceObstacleDisplay.classNames" :src="spaceObstacleDisplay.image" :alt="spaceObstacleDisplay.name" />
     </div>
   </div>
@@ -10,9 +10,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { useAuthStore } from '../../../Authentication/store/auth.store.ts';
-import type { User } from '../../../Authentication/models/user.types.ts';
-import { baseApiUrl } from '../../../shared/models/sharedVariables.ts';
+import { useAuthStore } from '../../../shared/stores/auth.store.ts';
+import type { User } from '../../../shared/models/user.types.ts';
 import './animationsHeader/backgroundSpace.scss';
 import './animationsHeader/astronaut.scss';
 import './animationsHeader/meteor.scss';

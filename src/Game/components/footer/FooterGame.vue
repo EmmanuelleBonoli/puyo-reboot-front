@@ -1,5 +1,7 @@
 <template>
   <div class="buttons-game" :class="authStore.user.isLeftHanded ? 'left-handed' : 'right-handed'">
+    <Score />
+
     <h1 class="title nabla-font">{{ t('game.name') }}</h1>
     <div class="coin-counter">
       <Avatar image="/images/Game/Store/oneCoin.png" shape="circle" />
@@ -8,7 +10,7 @@
     <Button @click="openStore" class="button-store" variant="outlined" rounded>
       <i class="store-icon fa-solid fa-store"></i>
     </Button>
-    <Avatar :image="baseApiUrl + user.avatar" size="large" shape="circle" class="avatar" @click="openProfile" />
+    <Avatar :image="user.avatar" size="large" shape="circle" class="avatar" @click="openProfile" />
   </div>
 </template>
 
@@ -16,10 +18,10 @@
 import { computed } from 'vue';
 import { Button, Avatar } from 'primevue';
 import { useI18n } from 'vue-i18n';
-import { useAuthStore } from '../../../Authentication/store/auth.store.ts';
-import type { User } from '../../../Authentication/models/user.types.ts';
-import { baseApiUrl } from '../../../shared/models/sharedVariables.ts';
+import { useAuthStore } from '../../../shared/stores/auth.store.ts';
+import type { User } from '../../../shared/models/user.types.ts';
 import { ScoreFacadeService } from '../../services/score-facade.service.ts';
+import Score from './Score.vue';
 
 const props = defineProps({
   isOpenMenu: Boolean,
@@ -56,6 +58,7 @@ function openProfile(event: Event): void {
   align-items: center;
   padding: 2%;
   background-color: var(--primary-color);
+  position: relative;
 
   &.left-handed {
     flex-direction: row;

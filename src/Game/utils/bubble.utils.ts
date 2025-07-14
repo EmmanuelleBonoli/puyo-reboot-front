@@ -47,7 +47,7 @@ export function getBubbleImage(bubble: Bubble): string {
   if (bubble.type === BubbleTypeEnum.GHOST || bubble.type === BubbleTypeEnum.UNBREAKABLE) {
     return `/images/Game/Bubbles/${bubble.type.toLowerCase()}.png`;
   }
-  return `/images/Game/Bubbles/${bubble.color.toLowerCase()}.png`;
+  return `/images/Game/Bubbles/${bubble.color?.toLowerCase()}.png`;
 }
 
 export function getMatchingGroup(grid: GridGame): Bubble[] {
@@ -219,4 +219,34 @@ export function findBubblesAroundPosition(position: GridPosition, gridGame: Grid
   }
 
   return bubbles;
+}
+
+// calcule le nombre de places dispo par colonne
+export function computeAvailableSlots(restingBubbles: Bubble[], columnCount: number, maxRow: number): Record<number, number> {
+  const occupiedHeights: Record<number, number> = {};
+
+  restingBubbles.forEach(b => {
+    const col = b.position.columnIndex;
+    occupiedHeights[col] = Math.max(occupiedHeights[col] ?? -1, b.position.rowIndex);
+  });
+
+  const availableSlots: Record<number, number> = {};
+  for (let col = 0; col < columnCount; col++) {
+    const lastOccupied = occupiedHeights[col] ?? -1;
+    availableSlots[col] = maxRow - lastOccupied;
+  }
+  return availableSlots;
+}
+
+// choisit une colonne parmi celles encore valides
+export function pickValidColumn(availableSlots: Record<number, number>): number | null {
+  const validColumns = Object.entries(availableSlots)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    .filter(([_, slots]) => slots > 0)
+    .map(([col]) => parseInt(col));
+
+  if (validColumns.length === 0) return null;
+
+  const index = Math.floor(Math.random() * validColumns.length);
+  return validColumns[index];
 }

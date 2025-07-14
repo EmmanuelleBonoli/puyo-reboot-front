@@ -1,7 +1,8 @@
 import { useRouter } from 'vue-router';
 import { useGameStore } from '../store/game.store.ts';
-import { deleteOldGameAndReturnNewOne, generateSpecialBubblesApi, getWaitingBubblesFromServer } from './game-api.service.ts';
+// import {gameApiService} from './game-api.service.ts';
 import {
+  computeAvailableSlots,
   computeGravityMovements,
   getCellKey,
   getNextOrientation,
@@ -11,6 +12,7 @@ import {
   isEmptyPosition,
   isFreeOfMovement,
   isInsideGrid,
+  pickValidColumn,
   placeBubblesOnGridGame,
   removeBubblesOnGridGame,
 } from '../utils/bubble.utils.ts';
@@ -20,7 +22,6 @@ import {
   CHANCE_TO_GENERATE_SPECIAL_BUBBLES,
   DIRECTIONS_MOVEMENT_GAME,
   FALLING_BUBBLES_DELAY_MS,
-  type Game,
   type GameData,
   type GridGame,
   ITEMS_INVENTORY,
@@ -28,33 +29,42 @@ import {
   OPPOSITE_ORIENTATION_MAP,
   CELL_SIZE,
   FALL_SPEED_PX_PER_MS,
+  COLS_GRID_GAME,
+  ROWS_VISIBLE_GRID_GAME,
+  ROWS_GRID_GAME,
 } from '../models/game.types.ts';
 import { BubbleStatusEnum } from '../models/BubbleStatusEnum.ts';
 import { OrientationMoveEnum } from '../models/OrientationMoveEnum.ts';
 import { BubbleTypeEnum } from '../models/BubbleTypeEnum.ts';
 import { generateRandomNumber } from '../../shared/services/utils.ts';
 import type { InventoryItemEnum } from '../models/InventoryItemEnum.ts';
+import { GameApiService } from './game-api.service.ts';
+import { AuthFacadeService } from '../../shared/services/auth-facade.service.ts';
 
 export class GameFacadeService {
+  private _gameApiService = new GameApiService();
+  private _authFacade = new AuthFacadeService();
   private _gameStore = useGameStore();
   private _router = useRouter();
 
+  async initializeUserAndGame(): Promise<void> {
+    await this._authFacade.getUser();
+    await this.getGame();
+  }
+
   async newGame(): Promise<void> {
-    const gameId = this._gameStore.getGame().id;
     try {
-      if (gameId) {
-        const newGame = await deleteOldGameAndReturnNewOne(gameId);
-        this._gameStore.setGame(newGame);
-      } else {
-        await this._router.push('/');
-      }
+      const newGame = await this._gameApiService.resetGameAndReturnNewOne();
+      this._gameStore.setGame(newGame);
     } catch (error) {
+      await this._router.push('/');
       throw error;
     }
   }
 
-  getGame(): Game {
-    return this._gameStore.getGame();
+  async getGame(): Promise<void> {
+    const game = await this._gameApiService.getGame();
+    this._gameStore.setGame(game);
   }
 
   deleteBubbles(bubblesToDelete: Bubble[]): void {
@@ -150,6 +160,10 @@ export class GameFacadeService {
       }
     }
 
+    if (game.waitingSpecialBubbles.length > 0) {
+      await this.promoteWaitingSpecialBubbles();
+    }
+
     // 1. Promouvoir si nécessaire
     if (!fallingBubbles && waitingBubbles) {
       this.promoteWaitingBubbles();
@@ -196,12 +210,12 @@ export class GameFacadeService {
       console.error('Erreur lors de la génération des bulles spéciales :', error);
     }
 
-    // Time out nécessaire sinon l'animation des special bubbles se déclenche pas.
-    // nextTick ne résout pas le problème.
-    setTimeout(async () => {
-      await this.applyGravity();
-      await this.gameOn();
-    }, 20);
+    // // Time out nécessaire sinon l'animation des special bubbles se déclenche pas.
+    // // nextTick ne résout pas le problème.
+    // setTimeout(async () => {
+    //   await this.applyGravity();
+    await this.gameOn();
+    // }, 20);
   }
 
   promoteWaitingBubbles(): void {
@@ -227,6 +241,51 @@ export class GameFacadeService {
     }
   }
 
+  async promoteWaitingSpecialBubbles(): Promise<void> {
+    const waitingSpecialBubbles = this._gameStore.getWaitingSpecialBubbles();
+    if (!waitingSpecialBubbles || waitingSpecialBubbles.length === 0) return;
+
+    const restingBubbles = this._gameStore.getRestingBubbles();
+    const columnCount = COLS_GRID_GAME;
+    const startRowAboveGrid = ROWS_VISIBLE_GRID_GAME; // 10
+    const maxRow = ROWS_GRID_GAME - 1; // 14
+
+    // 1. Calcul des slots dispo
+    const availableSlots = computeAvailableSlots(restingBubbles, columnCount, maxRow);
+
+    // 2. Suivi des spéciales déjà placées par colonne
+    const placedCounts: Record<number, number> = {};
+
+    // 3. Placement des bulles spéciales
+    for (const bubble of waitingSpecialBubbles) {
+      const columnIndex = pickValidColumn(availableSlots);
+
+      if (columnIndex === null) {
+        console.warn('⚠️ Aucune place dispo pour placer une bulle spéciale !');
+        continue;
+      }
+
+      const stackHeight = placedCounts[columnIndex] ?? 0;
+      const rowIndex = startRowAboveGrid + stackHeight;
+
+      if (rowIndex > maxRow) {
+        console.warn(`⚠️ Impossible de placer une bulle spéciale dans la colonne ${columnIndex}, plus de place`);
+        continue;
+      }
+
+      bubble.position = { rowIndex, columnIndex };
+      bubble.status = BubbleStatusEnum.RESTING;
+
+      // maj compteurs
+      placedCounts[columnIndex] = stackHeight + 1;
+      availableSlots[columnIndex] -= 1;
+    }
+
+    // 4. Mettre à jour le store
+    this._gameStore.addRestingBubbles(waitingSpecialBubbles);
+    this._gameStore.setWaitingSpecialBubbles([]);
+  }
+
   promoteFallingBubbles(): void {
     const fallingBubbles = this._gameStore.getFallingBubbles();
     if (fallingBubbles) {
@@ -244,7 +303,11 @@ export class GameFacadeService {
         statsGame: this._gameStore.getGame().statsGame,
       };
 
-      const newWaiting = await getWaitingBubblesFromServer(gameId, gameData);
+      const newWaiting = await this._gameApiService.getWaitingBubblesFromServer(gameId, gameData);
+      if (!newWaiting) {
+        console.warn('Aucune nouvelle bulle en attente !', newWaiting);
+        return;
+      }
       this._gameStore.setWaitingBubbles(newWaiting);
     } catch (error) {
       console.error('Erreur lors de la récupération des bulles en attente :', error);
@@ -401,7 +464,7 @@ export class GameFacadeService {
       statsGame: this._gameStore.getGame().statsGame,
     };
 
-    this._gameStore.addRestingBubbles(await generateSpecialBubblesApi(gameId, gameData));
+    this._gameStore.setWaitingSpecialBubbles(await this._gameApiService.generateSpecialBubblesApi(gameId, gameData));
   }
 
   async animateGravity(updated: Bubble[]): Promise<void> {

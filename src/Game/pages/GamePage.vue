@@ -26,20 +26,18 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
 import AnimationHeaderGame from '../components/game/AnimationHeaderGame.vue';
-import FooterGame from '../components/game/FooterGame.vue';
+import FooterGame from '../components/footer/FooterGame.vue';
 import StoreGame from '../components/store/StoreGame.vue';
 import GameMenu from '../components/menus/GameMenu.vue';
 import GamePuyo from '../components/game/GamePuyo.vue';
-import { AuthFacadeService } from '../../Authentication/services/auth-facade.service.ts';
+import { AuthFacadeService } from '../../shared/services/auth-facade.service.ts';
 import { GameFacadeService } from '../services/game-facade.service.ts';
-import type { User } from '../../Authentication/models/user.types.ts';
+import type { User } from '../../shared/models/user.types.ts';
 import { OrientationMoveEnum } from '../models/OrientationMoveEnum.ts';
 import GameOver from '../components/menus/GameOver.vue';
 import { useGameStore } from '../store/game.store.ts';
 
-const router = useRouter();
 const gameStore = useGameStore();
 const authFacade = new AuthFacadeService();
 const gameFacade = new GameFacadeService();
@@ -58,14 +56,12 @@ const isGameOver = computed<boolean>({
 
 const isGamePlayOn = computed<boolean>(() => {
   return !isOpenMenu.value && !isOpenStore.value && !isGameOver.value;
-  //return false ; // Pour les tests, on peut désactiver le jeu en activant cette ligne
+  // return false ; // Pour les tests, on peut désactiver le jeu en activant cette ligne
 });
 
 onMounted(async () => {
   user.value = await authFacade.getUser();
-  if (!user.value) {
-    await router.push('/login');
-  }
+  await gameFacade.getGame();
 });
 
 function onTouchStart(e: TouchEvent): void {

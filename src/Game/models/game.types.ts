@@ -14,7 +14,7 @@ export const MAX_OXYGEN: number = 100;
 export const MAX_INVENTORY_SIZE: number = 2;
 export const CHANCE_TO_GENERATE_SPECIAL_BUBBLES: number = 0.2; // = 20 %
 export const CELL_SIZE = 40;
-export const FALL_SPEED_PX_PER_MS = 0.2; // plus c'est petit grand plus c'est rapide
+export const FALL_SPEED_PX_PER_MS = 0.2; // plus c'est grand plus c'est rapide
 
 export const ITEMS_INVENTORY: ItemInventory[] = [
   {
@@ -90,6 +90,7 @@ export const INITIAL_GAME: Game = {
   restingBubbles: [],
   waitingBubbles: null,
   fallingBubbles: null,
+  waitingSpecialBubbles: [],
 };
 
 export type Game = {
@@ -98,6 +99,7 @@ export type Game = {
   restingBubbles: Bubble[];
   waitingBubbles: BubblePair | null;
   fallingBubbles: BubblePair | null;
+  waitingSpecialBubbles: Bubble[];
 };
 
 export type StatsGame = {
@@ -116,7 +118,7 @@ export type GameData = {
 export type Bubble = {
   id: string;
   position: GridPosition;
-  color: BubbleColorEnum;
+  color: BubbleColorEnum | null;
   type: BubbleTypeEnum;
   status: BubbleStatusEnum;
 };
@@ -126,13 +128,11 @@ export type GridPosition = {
   columnIndex: number;
 };
 
-export type BubblePairState = BubbleStatusEnum.WAITING | BubbleStatusEnum.FALLING;
-
 export type BubblePair = {
   pivot: Bubble;
   satellite: Bubble;
   orientation: BubbleSatelliteOrientationEnum;
-  status: BubblePairState;
+  status: BubbleStatusEnum;
 };
 
 export type FallStyle = {
