@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'astro puyo',
   webDir: 'dist',
   server: {
-    url: 'http://192.168.1.15:5421', // pour hot reload : nécessaire de mettre adresse ip (ipconfig) + port vite utilisé
+    url: process.env.VITE_FRONTEND_URL_LAN, // pour hot reload
     cleartext: true
   }
 };

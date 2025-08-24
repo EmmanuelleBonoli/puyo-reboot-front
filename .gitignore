@@ -1,6 +1,5 @@
 .env
-.env.development
-.env.staging
+.env.android
 
 # Logs
 logs

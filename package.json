@@ -1,12 +1,13 @@
 {
   "name": "puyo-puyo_frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "prepare": "husky",
-    "dev": "vite --mode development --host",
-    "build": "vue-tsc -b && vite build",
+    "dev:web": "vite --mode development --host",
+    "dev:android": "start /B vite --mode android && npx cap sync android && npx cap run android --target=Pixel_7_API_34 --live-reload --port=5421",
+    "build": "vue-tsc -b && vite build --mode android",
     "preview": "vite preview",
     "test": "jest --config jest.config.ts --verbose",
     "test:watch": "jest --watch"

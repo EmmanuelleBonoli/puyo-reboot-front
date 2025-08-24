@@ -19,7 +19,8 @@ export async function http<T>(url: string, options: RequestOptions = {}): Promis
     headers['Authorization'] = `Bearer ${store.token}`;
   }
 
-  const fullUrl = url.startsWith('http') ? url : `${baseApiUrl}${url}`;
+  //const fullUrl = url.startsWith('http') ? url : `${baseApiUrl}${url}`;
+  const fullUrl = `${baseApiUrl}${url}`;
 
   const response = await fetch(fullUrl, {
     ...options,
