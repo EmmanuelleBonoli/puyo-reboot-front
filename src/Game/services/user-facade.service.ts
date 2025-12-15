@@ -1,21 +1,12 @@
-import { useCommonToasts } from '../../shared/services/utils.ts';
-import {
-  getAvailableAstronautsApi,
-  getAvailableAvatarsApi,
-  updateAstronautApi,
-  updateAvatarApi,
-  updatePlayerNameApi,
-  updateSettingsApi,
-} from './user-api.service.ts';
-import type { LangCode, User } from '../../Authentication/models/user.types.ts';
-import { useAuthStore } from '../../Authentication/store/auth.store.ts';
+import { updateAstronautApi, updateAvatarApi, updatePlayerNameApi, updateSettingsApi } from './user-api.service.ts';
+import type { LangCode, User } from '../../shared/models/user.types.ts';
+import { useAuthStore } from '../../shared/stores/auth.store.ts';
 import { useI18n } from 'vue-i18n';
-import { AuthFacadeService } from '../../Authentication/services/auth-facade.service.ts';
+import { AuthFacadeService } from '../../shared/services/auth-facade.service.ts';
 
 export class UserFacadeService {
   private _authService = new AuthFacadeService();
   private _authStore = useAuthStore();
-  commonToasts = useCommonToasts();
   i18n = useI18n();
 
   setGameLanguage(lang: LangCode): void {
@@ -44,26 +35,6 @@ export class UserFacadeService {
       this._authStore.setUser(updatedUser);
     } catch (error) {
       throw error;
-    }
-  }
-
-  async getAvailableAvatars(): Promise<string[]> {
-    try {
-      return await getAvailableAvatarsApi();
-    } catch (error) {
-      console.error(`impossible de récupérer les avatars : ${error}`);
-      this.commonToasts.showToastError();
-      return [];
-    }
-  }
-
-  async getAvailableAstronauts(): Promise<string[]> {
-    try {
-      return await getAvailableAstronautsApi();
-    } catch (error) {
-      console.error(`impossible de récupérer les astronautes : ${error}`);
-      this.commonToasts.showToastError();
-      return [];
     }
   }
 

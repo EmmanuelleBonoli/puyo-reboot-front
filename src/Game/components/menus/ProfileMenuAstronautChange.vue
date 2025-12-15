@@ -6,7 +6,7 @@
         <img
           v-for="(astronaut, index) in availableAstronauts"
           :key="index"
-          :src="baseApiUrl + astronaut"
+          :src="astronaut.url"
           alt="Avatar"
           @click="
             emit('change', astronaut);
@@ -20,8 +20,8 @@
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Dialog } from 'primevue';
-import { baseApiUrl } from '../../../shared/models/sharedVariables.ts';
-import { UserFacadeService } from '../../services/user-facade.service.ts';
+import type { Image } from '../../../shared/models/user.types.ts';
+import { astronauts } from '../../../../public/assets/astronauts.ts';
 
 defineProps({
   activeChangeAstronaut: Boolean,
@@ -29,15 +29,14 @@ defineProps({
 
 const emit = defineEmits<{
   (e: 'close'): void;
-  (e: 'change', chosenAstronaut: string): void;
+  (e: 'change', chosenAstronaut: Image): void;
 }>();
 
-const userService = new UserFacadeService();
 const { t } = useI18n();
-const availableAstronauts = ref<string[]>([]);
+const availableAstronauts = ref<Image[]>([]);
 
 onMounted(async () => {
-  availableAstronauts.value = await userService.getAvailableAstronauts();
+  availableAstronauts.value = astronauts;
 });
 </script>
 

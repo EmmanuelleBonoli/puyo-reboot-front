@@ -10,7 +10,7 @@
         <img
           v-if="isBubble(cell) && cell.type === BubbleTypeEnum.GIFT"
           class="bubble-img gift"
-          :src="`/images/Game/Gifts/${cell.color.toLowerCase()}.png`"
+          :src="`/images/Game/Gifts/${cell.color?.toLowerCase()}.png`"
           alt="bubble" />
       </div>
     </div>
@@ -26,7 +26,7 @@
 </template>
 <script setup lang="ts">
 import { computed, watch, watchEffect } from 'vue';
-import { useAuthStore } from '../../../Authentication/store/auth.store.ts';
+import { useAuthStore } from '../../../shared/stores/auth.store.ts';
 
 import GameDashBoard from '../dashBoard/GameDashBoard.vue';
 import { useGameStore } from '../../store/game.store.ts';

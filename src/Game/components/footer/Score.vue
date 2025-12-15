@@ -44,8 +44,8 @@ watch(targetScore, newVal => {
 
 <style scoped>
 .score {
-  position: fixed;
-  bottom: 9%;
+  position: absolute;
+  top: -50%;
   left: 20%;
   padding: 0 1rem 0 1rem;
   width: 60%;

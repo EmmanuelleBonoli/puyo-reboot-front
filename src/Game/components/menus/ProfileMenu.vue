@@ -14,9 +14,9 @@
     </Button>
     <div class="user-astronaut">
       <div class="user-info">
-        <Avatar @click="activeChangeAvatar = true" :image="baseApiUrl + user?.avatar" shape="circle" size="large" class="cursor" />
+        <Avatar @click="activeChangeAvatar = true" :image="user?.avatar" shape="circle" size="large" class="cursor" />
         <div v-if="!activeChangePlayerName">
-          <Button class="p-button-text" rounded @click="activeChangePlayerName = true">{{ user?.playerName }} </Button>
+          <Button class="p-button-text" rounded @click="activeChangePlayerName = true">{{ user?.playerName }}</Button>
           <i class="fa-solid fa-pencil" @click="activeChangePlayerName = true"></i>
         </div>
         <div class="modify-playerName" v-else>
@@ -24,7 +24,7 @@
           <i class="fa-solid fa-floppy-disk" @click="changePlayerName()"></i>
         </div>
       </div>
-      <Avatar @click="activeChangeAstronaut = true" class="cursor" :image="baseApiUrl + user?.astronaut" shape="circle" size="xlarge" />
+      <Avatar @click="activeChangeAstronaut = true" class="cursor" :image="user?.astronaut" shape="circle" size="xlarge" />
     </div>
   </div>
   <ProfileMenuAvatarChange v-model:activeChangeAvatar="activeChangeAvatar" @close="activeChangeAvatar = false" @change="changeAvatar" />
@@ -39,23 +39,23 @@
 import { computed, onMounted, ref } from 'vue';
 import { Button, Avatar, InputText } from 'primevue';
 import { useI18n } from 'vue-i18n';
-import { GameFacadeService } from '../../services/game-facade.service.ts';
-import { useAuthStore } from '../../../Authentication/store/auth.store.ts';
-import type { User } from '../../../Authentication/models/user.types.ts';
+import { useAuthStore } from '../../../shared/stores/auth.store.ts';
+import type { User } from '../../../shared/models/user.types.ts';
 import type { Game } from '../../models/game.types.ts';
 import ProfileMenuAvatarChange from './ProfileMenuAvatarChange.vue';
-import { baseApiUrl } from '../../../shared/models/sharedVariables.ts';
 import { UserFacadeService } from '../../services/user-facade.service.ts';
 import { useCommonToasts } from '../../../shared/services/utils.ts';
 import ProfileMenuAstronautChange from './ProfileMenuAstronautChange.vue';
+import type { Image } from '../../../shared/models/user.types.ts';
+import { useGameStore } from '../../store/game.store.ts';
 
 const authStore = useAuthStore();
 const { t } = useI18n();
 const { showToastError } = useCommonToasts();
-const gameFacadeService = new GameFacadeService();
+const gameStore = useGameStore();
 const userFacadeService = new UserFacadeService();
 
-const game = ref<Game>(gameFacadeService.getGame());
+const game = ref<Game>(gameStore.getGame());
 const user = computed<User>(() => authStore.user);
 const playerName = ref('');
 const activeChangePlayerName = ref(false);
@@ -66,9 +66,9 @@ onMounted(() => {
   playerName.value = authStore.user?.playerName;
 });
 
-async function changeAvatar(chosenAvatar: string): Promise<void> {
+async function changeAvatar(chosenAvatar: Image): Promise<void> {
   try {
-    await userFacadeService.updateAvatar(chosenAvatar);
+    await userFacadeService.updateAvatar(chosenAvatar.url);
   } catch (error) {
     console.error("L'avatar n'a pu être changé", error);
     showToastError();
@@ -87,9 +87,9 @@ async function changePlayerName(): Promise<void> {
   activeChangePlayerName.value = false;
 }
 
-async function changeAstronaut(chosenAstronaut: string): Promise<void> {
+async function changeAstronaut(chosenAstronaut: Image): Promise<void> {
   try {
-    await userFacadeService.updateAstronaut(chosenAstronaut);
+    await userFacadeService.updateAstronaut(chosenAstronaut.url);
   } catch (error) {
     console.error("L'astronaute n'a pu être changé", error);
     showToastError();

@@ -15,14 +15,14 @@
 import { ProgressBar } from 'primevue';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { AuthFacadeService } from '../../Authentication/services/auth-facade.service.ts';
 import { useRouter } from 'vue-router';
+import { GameFacadeService } from '../services/game-facade.service.ts';
 
 const { t } = useI18n();
 const messages: string[] = [t('game.loadingMessage.message1'), t('game.loadingMessage.message2'), t('game.loadingMessage.message3')];
 
 const router = useRouter();
-const authFacade = new AuthFacadeService();
+const gameFacade = new GameFacadeService();
 const progressValue = ref(0);
 const loadingMessage = ref(messages[0]);
 const interval = ref();
@@ -35,12 +35,8 @@ onMounted(() => {
   startProgress();
 
   setTimeout(async () => {
-    const user = await authFacade.getUser();
-    if (user) {
-      await router.push('/game');
-    } else {
-      await router.push('/login');
-    }
+    await gameFacade.initializeUserAndGame();
+    await router.push('/game');
   }, DURATION_MS);
 });
 

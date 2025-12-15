@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import LoadingPage from '../Game/pages/LoadingPage.vue';
-import LoginPage from '../Authentication/pages/LoginPage.vue';
 import GamePage from '../Game/pages/GamePage.vue';
 
 const routes = [
@@ -8,11 +7,6 @@ const routes = [
     path: '/',
     name: 'LoadingPage',
     component: LoadingPage,
-  },
-  {
-    path: '/login',
-    name: 'LoginPage',
-    component: LoginPage,
   },
   {
     path: '/game',

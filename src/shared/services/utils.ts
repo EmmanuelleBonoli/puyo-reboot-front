@@ -1,6 +1,6 @@
 import { useToast } from 'primevue/usetoast';
 import { useI18n } from 'vue-i18n';
-import type { LangCode } from '../../Authentication/models/user.types.ts';
+import type { LangCode } from '../models/user.types.ts';
 
 export function useCommonToasts(): { showToastError: () => void } {
   const toast = useToast();

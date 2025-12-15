@@ -5,7 +5,7 @@
         <label for="switch1">{{ t('settings.music') }}</label>
         <ToggleSwitch
           @update:model-value="updateUserSettings('isMusicEnabled', $event)"
-          :model-value="user?.isMusicEnabled"
+          :model-value="user.isMusicEnabled"
           inputId="switch1"
           class="p-mb-2" />
       </div>
@@ -13,7 +13,7 @@
         <label for="switch2">{{ t('settings.soundEffects') }}</label>
         <ToggleSwitch
           @update:model-value="updateUserSettings('isSoundEffectsEnabled', $event)"
-          :model-value="user?.isSoundEffectsEnabled"
+          :model-value="user.isSoundEffectsEnabled"
           class="p-mb-2"
           inputId="2" />
       </div>
@@ -45,9 +45,9 @@
 import { computed } from 'vue';
 import { ToggleSwitch, Button, RadioButton } from 'primevue';
 import { useI18n } from 'vue-i18n';
-import { useAuthStore } from '../../../Authentication/store/auth.store.ts';
+import { useAuthStore } from '../../../shared/stores/auth.store.ts';
 import { useCommonToasts } from '../../../shared/services/utils.ts';
-import { type LangCode, type LANGUAGE } from '../../../Authentication/models/user.types.ts';
+import { type LangCode, type LANGUAGE } from '../../../shared/models/user.types.ts';
 import { UserFacadeService } from '../../services/user-facade.service.ts';
 
 const authStore = useAuthStore();
@@ -55,6 +55,7 @@ const { t } = useI18n();
 const userFacadeService = new UserFacadeService();
 const { showToastError } = useCommonToasts();
 const user = computed(() => authStore.user);
+
 const languages = computed<LANGUAGE[]>(() => [
   {
     label: t('settings.english'),

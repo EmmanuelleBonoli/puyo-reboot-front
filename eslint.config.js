@@ -10,9 +10,9 @@ export default [
         files: ["**/*.ts", "**/*.vue"],
         ignores: ["coverage/**", "**/*.spec.ts"],
         languageOptions: {
-            parser: vueParser,  // <-- ici un objet, pas une string
+            parser: vueParser,
             parserOptions: {
-                parser: tsParser, // <-- ici aussi, un objet
+                parser: tsParser,
                 ecmaVersion: "latest",
                 sourceType: "module",
                 extraFileExtensions: [".vue"],
@@ -23,7 +23,7 @@ export default [
         },
         rules: {
             "no-else-return": ["error", {allowElseIf: false}],
-            "newline-per-chained-call": ["error", {ignoreChainWithDepth: 2}],
+            "newline-per-chained-call": ["error", {ignoreChainWithDepth: 3}],
             "@typescript-eslint/max-params": ["warn", {max: 3}],
             "@typescript-eslint/no-explicit-any": "warn",
             "@typescript-eslint/explicit-function-return-type": "error",

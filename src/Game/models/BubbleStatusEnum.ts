@@ -1,5 +1,6 @@
 export enum BubbleStatusEnum {
   WAITING = 'WAITING',
+  WAITING_SPECIAL = 'WAITING_SPECIAL',
   FALLING = 'FALLING',
   RESTING = 'RESTING',
 }

@@ -71,6 +71,7 @@ export const useGameStore = defineStore('game', () => {
       restingBubbles: dataGame.restingBubbles ?? [],
       waitingBubbles: dataGame.waitingBubbles ?? null,
       fallingBubbles: dataGame.fallingBubbles ?? null,
+      waitingSpecialBubbles: dataGame.waitingSpecialBubbles ?? [],
     };
   }
 
@@ -92,6 +93,14 @@ export const useGameStore = defineStore('game', () => {
 
   function getRestingBubbles(): Bubble[] {
     return game.value.restingBubbles ?? [];
+  }
+
+  function getWaitingSpecialBubbles(): Bubble[] {
+    return game.value.waitingSpecialBubbles ?? [];
+  }
+
+  function setWaitingSpecialBubbles(bubbles: Bubble[] = []): void {
+    game.value.waitingSpecialBubbles = [...bubbles];
   }
 
   function addRestingBubbles(bubbles: Bubble[]): void {
@@ -121,6 +130,8 @@ export const useGameStore = defineStore('game', () => {
     getFallingBubbles,
     setFallingBubbles,
     setWaitingBubbles,
+    getWaitingSpecialBubbles,
+    setWaitingSpecialBubbles,
     updatePositionBubbles,
     getGame,
     setGame,

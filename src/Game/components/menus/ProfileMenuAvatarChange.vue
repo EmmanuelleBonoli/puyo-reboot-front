@@ -6,7 +6,7 @@
         <img
           v-for="(avatar, index) in availableAvatars"
           :key="index"
-          :src="baseApiUrl + avatar"
+          :src="avatar.url"
           alt="Avatar"
           @click="
             emit('change', avatar);
@@ -20,8 +20,8 @@
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { Dialog } from 'primevue';
-import { baseApiUrl } from '../../../shared/models/sharedVariables.ts';
-import { UserFacadeService } from '../../services/user-facade.service.ts';
+import { avatars } from '../../../../public/assets/avatars.ts';
+import type { Image } from '../../../shared/models/user.types.ts';
 
 defineProps({
   activeChangeAvatar: Boolean,
@@ -29,15 +29,14 @@ defineProps({
 
 const emit = defineEmits<{
   (e: 'close'): void;
-  (e: 'change', avatarChoose: string): void;
+  (e: 'change', avatarChoose: Image): void;
 }>();
 
-const userService = new UserFacadeService();
 const { t } = useI18n();
-const availableAvatars = ref<string[]>([]);
+const availableAvatars = ref<Image[]>([]);
 
 onMounted(async () => {
-  availableAvatars.value = await userService.getAvailableAvatars();
+  availableAvatars.value = avatars;
 });
 </script>
 
