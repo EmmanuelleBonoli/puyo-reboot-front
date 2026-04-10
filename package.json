@@ -6,7 +6,8 @@
   "scripts": {
     "prepare": "husky",
     "dev:web": "vite --mode development --host",
-    "dev:android": "start /B vite --mode android && npx cap sync android && npx cap run android --target=Pixel_7_API_34 --live-reload --port=5421",
+    "dev:android:vite": "vite --mode android --host 0.0.0.0 --port 5421",
+    "dev:android:cap": "npx cap sync android && npx cap run android --target=Pixel_7_API_34 --live-reload --host=192.168.1.11  --port=5421",
     "build": "vue-tsc -b && vite build --mode android",
     "test": "jest --config jest.config.ts --verbose",
     "test:watch": "jest --watch"

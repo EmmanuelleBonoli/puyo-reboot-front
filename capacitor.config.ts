@@ -17,7 +17,7 @@ const config: CapacitorConfig = {
     }
   },
   server: {
-    url: process.env.VITE_FRONTEND_URL_LAN, // pour hot reload
+    url: "http://10.0.2.2:5421", // pour hot reload
     cleartext: true
   }
 };
