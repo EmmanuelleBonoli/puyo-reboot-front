@@ -5,13 +5,13 @@ const isProdBuild = process.env.CAPACITOR_ENV === 'production';
 
 const config: CapacitorConfig = {
   appId: 'com.majorgame.puyo',
-  appName: 'astro puyo',
+  appName: 'Space Match',
   webDir: 'dist',
   plugins: {
     CapacitorSQLite: {
       iosDatabaseLocation: 'Library/CapacitorDatabase',
       iosIsEncryption: true,
-      iosKeychainPrefix: 'astro-puyo',
+      iosKeychainPrefix: 'space-match',
       androidIsEncryption: true,
       androidBiometric: {
         biometricAuth: false,
