@@ -16,16 +16,8 @@ class UserRepository {
     });
   }
 
-  async updateAvatar(avatar: string): Promise<void> {
-    await storageService.update('user', { avatar });
-  }
-
   async updateAstronaut(astronaut: string): Promise<void> {
     await storageService.update('user', { astronaut });
-  }
-
-  async updatePlayerName(playerName: string): Promise<void> {
-    await storageService.update('user', { playerName });
   }
 }
 

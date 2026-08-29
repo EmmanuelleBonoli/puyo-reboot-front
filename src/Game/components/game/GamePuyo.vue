@@ -20,7 +20,6 @@
         <img v-if="waitingBubbles" :src="getBubbleImage(waitingBubbles.satellite)" alt="bubble" class="bubble-img" />
         <img v-if="waitingBubbles" :src="getBubbleImage(waitingBubbles.pivot)" alt="bubble" class="bubble-img" />
       </div>
-      <GameDashBoard />
     </div>
   </div>
 </template>
@@ -28,7 +27,6 @@
 import { computed, watch, watchEffect } from 'vue';
 import { useAuthStore } from '../../../shared/stores/auth.store.ts';
 
-import GameDashBoard from '../dashBoard/GameDashBoard.vue';
 import { useGameStore } from '../../store/game.store.ts';
 import { type Bubble, type BubblePair, type GridGame } from '../../models/game.types.ts';
 import { getBubbleImage, getMatchingGroup, isBubble } from '../../utils/bubble.utils.ts';
@@ -115,7 +113,7 @@ function updateOxygen(matchingBubblesNumber: number): void {
 <style scoped>
 .game-container {
   width: 100%;
-  height: 70%;
+  height: 100%;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -130,11 +128,11 @@ function updateOxygen(matchingBubblesNumber: number): void {
 
   .grid-game {
     display: grid;
-    grid-template-rows: repeat(15, 40px);
-    grid-template-columns: repeat(6, 40px);
+    grid-template-rows: repeat(15, 33px);
+    grid-template-columns: repeat(7, 33px);
     transform: scaleY(-1);
     overflow: hidden;
-    height: 400px;
+    height: 330px;
   }
 
   .info-game {
@@ -146,8 +144,8 @@ function updateOxygen(matchingBubblesNumber: number): void {
     .waiting-bubbles {
       display: grid;
       width: 100%;
-      grid-template-rows: repeat(2, 50px);
-      grid-template-columns: repeat(1, 50px);
+      grid-template-rows: repeat(2, 35px);
+      grid-template-columns: repeat(1, 35px);
       padding: 10%;
       border-radius: 10px;
       justify-content: center;

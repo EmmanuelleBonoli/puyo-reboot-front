@@ -15,7 +15,7 @@ class GameServerService {
     const fallingBubblesData = bubbles.filter(bubbles => bubbles.status === BubbleStatusEnum.FALLING);
 
     return {
-      id: game.id,
+      id: 'local_game',
       statsGame: {
         score: game.score,
         oxygen: game.oxygenLevel,
@@ -38,8 +38,8 @@ class GameServerService {
     await gameRepository.deleteGame();
   }
 
-  async insertGame(userId: string, gameId: string): Promise<void> {
-    await gameRepository.insertGame(userId, gameId);
+  async insertGame(): Promise<void> {
+    await gameRepository.insertGame();
   }
 
   async updateGameData(gameData: GameData): Promise<void> {

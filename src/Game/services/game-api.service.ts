@@ -1,28 +1,24 @@
 import type { Bubble, BubblePair, Game, GameData } from '../models/game.types.ts';
-import { useAuthStore } from '../../shared/stores/auth.store.ts';
 import { bubbleServerService } from '../../Api/services/bubble.server.service.ts';
 import { gameServerService } from '../../Api/services/game.server.service.ts';
 import { playerStatsServerService } from '../../Api/services/playerStats.server.service.ts';
 import { generateUUID } from '../../shared/utils/shared.utils.ts';
 
 export class GameApiService {
-  private _authStore = useAuthStore();
-
   async deleteOldGame(): Promise<void> {
     await gameServerService.deleteGame();
   }
 
   async createNewGame(): Promise<Game> {
-    const user = this._authStore.getUser();
     const newGameId = generateUUID();
 
-    await gameServerService.insertGame(user.id, newGameId);
+    await gameServerService.insertGame();
 
     const playerStats = await playerStatsServerService.getPlayerStats();
 
-    await bubbleServerService.createWaitingBubbles(newGameId);
+    await bubbleServerService.createWaitingBubbles();
     const updatedFirstFallingBubbles = await bubbleServerService.promoteWaitingToFalling();
-    const firstWaitingBubbles = await bubbleServerService.createWaitingBubbles(newGameId);
+    const firstWaitingBubbles = await bubbleServerService.createWaitingBubbles();
 
     return {
       id: newGameId,
@@ -45,15 +41,15 @@ export class GameApiService {
     return await this.createNewGame();
   }
 
-  async getWaitingBubblesFromServer(gameId: string, gameData: GameData): Promise<BubblePair | null> {
+  async getWaitingBubblesFromServer(gameData: GameData): Promise<BubblePair | null> {
     await gameServerService.updateGameData(gameData);
-    const waitingBubbles = await bubbleServerService.createWaitingBubbles(gameId);
+    const waitingBubbles = await bubbleServerService.createWaitingBubbles();
     return bubbleServerService.convertBubblesApiToBubblePair(waitingBubbles);
   }
 
-  async generateSpecialBubblesApi(gameId: string, gameData: GameData): Promise<Bubble[]> {
+  async generateSpecialBubblesApi(gameData: GameData): Promise<Bubble[]> {
     await gameServerService.updateGameData(gameData);
-    return await bubbleServerService.createWaitingSpecialBubbles(gameId);
+    return await bubbleServerService.createWaitingSpecialBubbles();
   }
 
   async getGame(): Promise<Game> {

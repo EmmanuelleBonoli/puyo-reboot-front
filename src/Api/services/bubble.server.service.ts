@@ -38,14 +38,13 @@ class BubbleServerService {
     };
   }
 
-  async createWaitingBubbles(gameId: string, count = 2): Promise<Bubble[]> {
+  async createWaitingBubbles(count = 2): Promise<Bubble[]> {
     const bubbles: BubbleApi[] = [];
 
     for (let i = 0; i < count; i++) {
       const isPivot = i === 0;
       const bubble: BubbleApi = {
         id: generateUUID(),
-        gameId: gameId,
         type: BubbleTypeEnum.NORMAL,
         color: getRandomColor(),
         status: BubbleStatusEnum.WAITING,
@@ -65,7 +64,7 @@ class BubbleServerService {
     return this.fromServerToClient(bubblesUpdated);
   }
 
-  async createWaitingSpecialBubbles(gameId: string): Promise<Bubble[]> {
+  async createWaitingSpecialBubbles(): Promise<Bubble[]> {
     const maxSpecialBubbles = RulesGame.MAX_SPECIAL_BUBBLES;
     const numberOfSpecialBubbles = Math.floor(Math.random() * maxSpecialBubbles) + 1;
 
@@ -77,7 +76,6 @@ class BubbleServerService {
 
       const bubble: BubbleApi = {
         id: generateUUID(),
-        gameId,
         type,
         color,
         status: BubbleStatusEnum.RESTING,

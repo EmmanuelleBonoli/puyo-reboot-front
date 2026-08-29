@@ -9,6 +9,7 @@
     "dev:android:vite": "vite --mode android --host 0.0.0.0 --port 5421",
     "dev:android:cap": "npx cap sync android && npx cap run android --target=Pixel_7_API_34 --live-reload --host=192.168.1.11  --port=5421",
     "build": "vue-tsc -b && vite build --mode android",
+    "build:android:prod": "vue-tsc -b && vite build --mode android && cross-env CAPACITOR_ENV=production npx cap sync android",
     "test": "jest --config jest.config.ts --verbose",
     "test:watch": "jest --watch"
   },
@@ -32,6 +33,7 @@
     "@typescript-eslint/parser": "^8.32.1",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.7.0",
+    "cross-env": "^10.1.0",
     "eslint": "^9.27.0",
     "eslint-plugin-vue": "^10.1.0",
     "husky": "^9.1.7",

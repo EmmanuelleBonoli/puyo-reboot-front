@@ -2,17 +2,11 @@
   "common": {
     "error": "Something went wrong. Please try again."
   },
-  "login": {
-    "email": "Email",
-    "emailMinLength": "Email must be at least 3 characters long.",
-    "emailRequired": "Email is required.",
-    "password": "Password",
-    "passwordMinLength": "Password must be at least 8 characters long.",
-    "passwordRequired": "Password is required.",
-    "passwordUppercase": "Password must contain at least one uppercase letter.",
-    "passwordCharacter": "Password must contain at least one special character.",
-    "formSubmit": "Submit",
-    "formError": "Connection error, please try again."
+  "home": {
+    "play": "Play",
+    "store": "Store",
+    "settings": "Settings",
+    "bestScore": "Best score"
   },
   "game": {
     "name": "Astro Puyo",
@@ -41,6 +35,29 @@
     "bestScore": "Best score :",
     "myAstronaut": "My astronaut",
     "chooseAvatar": "Choose your avatar :",
-    "chooseAstronaut": "Choose your astronaut :"
+    "chooseAstronaut": "Choose your astronaut :",
+    "restorePurchases": "Restore Purchases",
+    "contactUs": "Contact Us",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "rights": "All rights reserved",
+    "version": "Version 1.0.0",
+    "audio": "Audio",
+    "controls": "Controls",
+    "accountSupport": "Account & Support",
+    "legal": "Legal",
+    "title": "Settings",
+    "aboutTitle": "About",
+    "contact": "Contact",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "reset": "Reset Settings"
+  },
+  "tutorial": {
+    "list_title": "Tutorials",
+    "game_tutorial": "How to play",
+    "bonus_extra_letter_name": "Bonus: Extra Letter",
+    "bonus_double_distance_name": "Bonus: Double Distance",
+    "bonus_freeze_rival_name": "Bonus: Freeze Rival"
   }
 }

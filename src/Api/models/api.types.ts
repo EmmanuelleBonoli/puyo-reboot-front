@@ -3,16 +3,15 @@ import type { BubbleColorEnum } from '../../Game/models/BubbleColorEnum.ts';
 import type { BubbleStatusEnum } from '../../Game/models/BubbleStatusEnum.ts';
 import type { User } from '../../shared/models/user.types.ts';
 
-export type DatabaseSchema = {
+export type AppStorageData = {
   user: User;
   game: GameApi;
-  bubble: BubbleApi;
+  bubbles: BubbleApi[];
   playerStats: PlayerStatsApi;
 };
 
 export type GameApi = {
-  id: string;
-  userId: string;
+  isSeeded: boolean;
   score: number;
   oxygenLevel: number;
   inventory: string[];
@@ -20,7 +19,6 @@ export type GameApi = {
 
 export type BubbleApi = {
   id: string;
-  gameId: string;
   type: BubbleTypeEnum;
   color: BubbleColorEnum | null;
   isPivot: boolean;
@@ -30,8 +28,6 @@ export type BubbleApi = {
 };
 
 export type PlayerStatsApi = {
-  id: string;
-  userId: string;
   bestScore: number;
   coins: number;
 };

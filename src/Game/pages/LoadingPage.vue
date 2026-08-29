@@ -36,7 +36,7 @@ onMounted(() => {
 
   setTimeout(async () => {
     await gameFacade.initializeUserAndGame();
-    await router.push('/game');
+    await router.push('/home');
   }, DURATION_MS);
 });
 
