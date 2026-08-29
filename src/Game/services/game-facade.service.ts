@@ -1,6 +1,5 @@
 import { useRouter } from 'vue-router';
 import { useGameStore } from '../store/game.store.ts';
-// import {gameApiService} from './game-api.service.ts';
 import {
   computeAvailableSlots,
   computeGravityMovements,
@@ -153,7 +152,7 @@ export class GameFacadeService {
     // 0. Si nouvelle partie,
     if (!fallingBubbles && !waitingBubbles) {
       try {
-        await this.generatingWaitingBubbles(game.id);
+        await this.generatingWaitingBubbles();
         waitingBubbles = this._gameStore.getWaitingBubbles();
       } catch (error) {
         console.error('Erreur lors de la récupération des bulles en attente :', error);
@@ -175,7 +174,7 @@ export class GameFacadeService {
 
       // 2. Ne générer de nouvelles bulles que si on a promues les précédentes
       try {
-        await this.generatingWaitingBubbles(game.id);
+        await this.generatingWaitingBubbles();
       } catch (error) {
         console.error('Erreur lors de la récupération des bulles en attente :', error);
       }
@@ -205,7 +204,7 @@ export class GameFacadeService {
 
     // 6 Générer aléatoirement des bulles spéciales (gift, ghost, unbreakable)
     try {
-      await this.generateSpecialBubblesIfNeeded(game.id);
+      await this.generateSpecialBubblesIfNeeded();
     } catch (error) {
       console.error('Erreur lors de la génération des bulles spéciales :', error);
     }
@@ -230,11 +229,11 @@ export class GameFacadeService {
       waitingBubbles.satellite.status = BubbleStatusEnum.FALLING;
       waitingBubbles.pivot.position = {
         rowIndex: 8,
-        columnIndex: 2,
+        columnIndex: 3,
       };
       waitingBubbles.satellite.position = {
         rowIndex: 9,
-        columnIndex: 2,
+        columnIndex: 3,
       };
       this._gameStore.setFallingBubbles(waitingBubbles);
       this._gameStore.setWaitingBubbles(null);
@@ -296,14 +295,14 @@ export class GameFacadeService {
     }
   }
 
-  async generatingWaitingBubbles(gameId: string): Promise<void> {
+  async generatingWaitingBubbles(): Promise<void> {
     try {
       const gameData: GameData = {
         restingBubbles: this._gameStore.getRestingBubbles(),
         statsGame: this._gameStore.getGame().statsGame,
       };
 
-      const newWaiting = await this._gameApiService.getWaitingBubblesFromServer(gameId, gameData);
+      const newWaiting = await this._gameApiService.getWaitingBubblesFromServer(gameData);
       if (!newWaiting) {
         console.warn('Aucune nouvelle bulle en attente !', newWaiting);
         return;
@@ -441,8 +440,8 @@ export class GameFacadeService {
     const grid = this._gameStore.getGridGame();
 
     const entryPositions = [
-      { rowIndex: 8, columnIndex: 2 },
-      { rowIndex: 9, columnIndex: 2 },
+      { rowIndex: 8, columnIndex: 3 },
+      { rowIndex: 9, columnIndex: 3 },
     ];
 
     return entryPositions.some(pos => {
@@ -455,7 +454,7 @@ export class GameFacadeService {
     this._gameStore.setIsGameOver(isOver);
   }
 
-  async generateSpecialBubblesIfNeeded(gameId: string): Promise<void> {
+  async generateSpecialBubblesIfNeeded(): Promise<void> {
     const shouldGenerate = Math.random() < CHANCE_TO_GENERATE_SPECIAL_BUBBLES;
     if (!shouldGenerate) return;
 
@@ -464,7 +463,7 @@ export class GameFacadeService {
       statsGame: this._gameStore.getGame().statsGame,
     };
 
-    this._gameStore.setWaitingSpecialBubbles(await this._gameApiService.generateSpecialBubblesApi(gameId, gameData));
+    this._gameStore.setWaitingSpecialBubbles(await this._gameApiService.generateSpecialBubblesApi(gameData));
   }
 
   async animateGravity(updated: Bubble[]): Promise<void> {

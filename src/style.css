@@ -7,6 +7,10 @@
   --background-color: #1e293b;
   --surface-card: #485362;
   --secondary-color: #fda931;
+  --text-blue: #79faff;
+  --text-yellow: #f6b122;
+  --text-beige: #fcf8e0;
+  --text-dark-red: #610f00;
 }
 
 * {

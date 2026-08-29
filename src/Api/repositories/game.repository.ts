@@ -8,10 +8,9 @@ class GameRepository {
     await storageService.truncate('game');
   }
 
-  async insertGame(userId: string, gameId: string): Promise<void> {
+  async insertGame(): Promise<void> {
     await storageService.insert('game', {
-      id: gameId,
-      userId,
+      isSeeded: true,
       score: 0,
       oxygenLevel: 100,
       inventory: [],

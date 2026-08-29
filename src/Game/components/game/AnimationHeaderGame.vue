@@ -55,7 +55,7 @@ function showRandomObstacle(): void {
 
 <style scoped lang="scss">
 .animation-header {
-  height: 20%;
+  height: 100%;
   width: 100%;
   overflow: hidden;
   position: relative;

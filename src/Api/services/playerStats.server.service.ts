@@ -11,7 +11,7 @@ class PlayerStatsServerService {
   }
 
   async updateCoins(newCoins: number): Promise<void> {
-    await playerStatsRepository.saveBestScore(newCoins);
+    await playerStatsRepository.updateCoins(newCoins);
   }
 }
 

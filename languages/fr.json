@@ -2,17 +2,11 @@
   "common": {
     "error": "Un problème est survenu, veuillez réessayer"
   },
-  "login": {
-    "email": "E-mail",
-    "emailMinLength": "L'e-mail doit contenir au moins 3 caractères.",
-    "emailRequired": "L'e-mail est requis.",
-    "password": "Mot de passe",
-    "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères.",
-    "passwordRequired": "Le mot de passe est requis.",
-    "passwordUppercase": "Le mot de passe doit contenir au moins une lettre majuscule.",
-    "passwordCharacter": "Le mot de passe doit contenir au moins un caractère spécial.",
-    "formSubmit": "Envoyer",
-    "formError": "Erreur de connexion, veuillez réessayer."
+  "home": {
+    "play": "Jouer",
+    "store": "Store",
+    "settings": "Paramètres",
+    "bestScore": "Meilleur score"
   },
   "game": {
     "name": "Astro Puyo",
@@ -41,6 +35,29 @@
     "bestScore": "Meilleur score :",
     "myAstronaut": "Mon astronaute",
     "chooseAvatar": "Choisis ton avatar :",
-    "chooseAstronaut": "Choisis ton astronaute :"
+    "chooseAstronaut": "Choisis ton astronaute :",
+    "restorePurchases": "Restaurer les achats",
+    "contactUs": "Contactez-nous",
+    "terms": "Conditions Générales",
+    "privacy": "Politique de Confidentialité",
+    "rights": "Tous droits réservés",
+    "version": "Version",
+    "audio": "Audio",
+    "controls": "Contrôles",
+    "accountSupport": "Compte & Support",
+    "legal": "Légal",
+    "title": "Réglages",
+    "aboutTitle": "À propos",
+    "contact": "Contact",
+    "privacyPolicy": "Politique de confidentialité",
+    "termsOfService": "Conditions d'utilisation",
+    "reset": "Réinitialiser"
+  },
+  "tutorial": {
+    "list_title": "Tutoriels",
+    "game_tutorial": "Comment jouer",
+    "bonus_extra_letter_name": "Bonus : Lettre supplémentaire",
+    "bonus_double_distance_name": "Bonus : Distance x2",
+    "bonus_freeze_rival_name": "Bonus : Gel de l'adversaire"
   }
 }

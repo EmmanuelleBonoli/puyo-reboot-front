@@ -25,7 +25,7 @@ class BubbleRepository {
       {
         status: BubbleStatusEnum.FALLING,
         rowIndex: 8,
-        columnIndex: 2,
+        columnIndex: 3,
       }
     );
 
@@ -37,7 +37,7 @@ class BubbleRepository {
       {
         status: BubbleStatusEnum.FALLING,
         rowIndex: 9,
-        columnIndex: 2,
+        columnIndex: 3,
       }
     );
 

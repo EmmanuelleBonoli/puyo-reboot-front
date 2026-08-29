@@ -1,49 +1,44 @@
 <template>
   <div class="page game-page" @touchstart="onTouchStart" @touchmove="onTouchMove" @touchend="onTouchEnd">
-    <AnimationHeaderGame />
+    <Header />
+    <Game :isGamePlayOn="isGamePlayOn" />
+    <Footer
+      @openStore="goToStore"
+      @pause="togglePause"
+      @openMenu="
+        isPaused = true;
+        router.push('/home');
+      " />
 
-    <svg viewBox="0 0 100 10" width="100%" height="60" preserveAspectRatio="none">
-      <path d="M0,0 L0,1 L10,1 L20,9 L80,9 L90,1 L100,1 L100,0 Z" fill="black" />
-      <polyline points="0,1 10,1 20,9 80,9 90,1 100,1" fill="none" stroke="white" stroke-width="0.5" />
-      <path d="M0,1 L10,1 L20,9 L80,9 L90,1 L100,1 L100,10 L0,10 Z" fill="#1e293b" />
-    </svg>
-
-    <GamePuyo :isGamePlayOn="isGamePlayOn" />
-
-    <svg viewBox="0 0 100 10" width="100%" height="60" preserveAspectRatio="none">
-      <path d="M0,0 L0,9 L10,9 L20,1 L80,1 L90,9 L100,9 L100,0 Z" fill="#1e293b" />
-      <polyline points="0,9 10,9 20,1 80,1 90,9 100,9" fill="none" stroke="white" stroke-width="0.5" />
-      <path d="M0,9 L10,9 L20,1 L80,1 L90,9 L100,9 L100,10 L0,10 Z" fill="black" />
-    </svg>
-
-    <FooterGame v-model:isOpenMenu="isOpenMenu" v-model:isOpenStore="isOpenStore" />
-
-    <GameMenu v-model:isOpenMenu="isOpenMenu" />
-    <StoreGame v-model:isOpenStore="isOpenStore" />
     <GameOver v-model:isGameOver="isGameOver" />
+
+    <div v-if="isPaused && !isGameOver" class="pause-overlay" @click="togglePause">
+      <h2>PAUSED</h2>
+      <p>Tap to resume</p>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import AnimationHeaderGame from '../components/game/AnimationHeaderGame.vue';
-import FooterGame from '../components/footer/FooterGame.vue';
-import StoreGame from '../components/store/StoreGame.vue';
-import GameMenu from '../components/menus/GameMenu.vue';
-import GamePuyo from '../components/game/GamePuyo.vue';
 import { AuthFacadeService } from '../../shared/services/auth-facade.service.ts';
 import { GameFacadeService } from '../services/game-facade.service.ts';
 import type { User } from '../../shared/models/user.types.ts';
 import { OrientationMoveEnum } from '../models/OrientationMoveEnum.ts';
 import GameOver from '../components/menus/GameOver.vue';
 import { useGameStore } from '../store/game.store.ts';
+import Footer from '../components/game2/footer/Footer.vue';
+import Header from '../components/game2/header/Header.vue';
+import Game from '../components/game2/game/Game.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const gameStore = useGameStore();
 const authFacade = new AuthFacadeService();
 const gameFacade = new GameFacadeService();
 const user = ref<User | null>(null);
-const isOpenMenu = ref(true);
-const isOpenStore = ref(false);
+const isPaused = ref(false);
 
 const startX = ref(0);
 const startY = ref(0);
@@ -55,9 +50,19 @@ const isGameOver = computed<boolean>({
 });
 
 const isGamePlayOn = computed<boolean>(() => {
-  return !isOpenMenu.value && !isOpenStore.value && !isGameOver.value;
-  // return false ; // Pour les tests, on peut désactiver le jeu en activant cette ligne
+  return !isGameOver.value && !isPaused.value;
 });
+
+function goToStore(): void {
+  isPaused.value = true;
+  router.push('/store');
+}
+
+function togglePause(): void {
+  if (!isGameOver.value) {
+    isPaused.value = !isPaused.value;
+  }
+}
 
 onMounted(async () => {
   user.value = await authFacade.getUser();
@@ -118,4 +123,27 @@ function onTouchEnd(e: TouchEvent): void {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.pause-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  color: white;
+  cursor: pointer;
+  backdrop-filter: blur(2px);
+}
+
+.pause-overlay h2 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+}
+</style>

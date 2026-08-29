@@ -17,16 +17,8 @@ export const useAuthStore = defineStore('user', () => {
     user.value = { ...user.value, language: lang };
   }
 
-  function setAvatar(avatar: string): void {
-    user.value = { ...user.value, avatar: avatar };
-  }
-
   function setAstronaut(astronaut: string): void {
     user.value = { ...user.value, astronaut: astronaut };
-  }
-
-  function setPlayerName(playerName: string): void {
-    user.value = { ...user.value, playerName: playerName };
   }
 
   return {
@@ -34,8 +26,6 @@ export const useAuthStore = defineStore('user', () => {
     getUser,
     setUser,
     setGameLanguage,
-    setAvatar,
     setAstronaut,
-    setPlayerName,
   };
 });

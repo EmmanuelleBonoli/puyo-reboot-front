@@ -15,12 +15,4 @@ export class AuthFacadeService {
       return initialUser;
     }
   }
-
-  getFromLocalStorage(item: string): string | null {
-    return localStorage.getItem(item);
-  }
-
-  saveToLocalStorage(item: string, value: string): void {
-    localStorage.setItem(item, value);
-  }
 }
