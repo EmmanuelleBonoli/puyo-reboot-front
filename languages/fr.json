@@ -9,7 +9,7 @@
     "bestScore": "Meilleur score"
   },
   "game": {
-    "name": "Astro Puyo",
+    "name": "Space Match",
     "astronaut": "Astronaute",
     "planet": "Planète",
     "loadingMessage": {

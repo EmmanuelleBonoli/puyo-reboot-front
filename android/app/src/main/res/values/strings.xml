@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">astro puyo</string>
-    <string name="title_activity_main">astro puyo</string>
+    <string name="app_name">Space Match</string>
+    <string name="title_activity_main">Space Match</string>
     <string name="package_name">com.majorgame.puyo</string>
     <string name="custom_url_scheme">com.majorgame.puyo</string>
 </resources>
